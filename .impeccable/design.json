@@ -1,0 +1,217 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-05-31T00:00:00.000Z",
+  "title": "Design System: Votely",
+  "extensions": {
+    "colorMeta": {
+      "assembly-blue": {
+        "role": "primary",
+        "displayName": "Assembly Blue",
+        "canonical": "oklch(0.49 0.21 255)",
+        "tonalRamp": [
+          "oklch(0.18 0.18 255)",
+          "oklch(0.26 0.20 255)",
+          "oklch(0.34 0.21 255)",
+          "oklch(0.42 0.21 255)",
+          "oklch(0.49 0.21 255)",
+          "oklch(0.58 0.19 255)",
+          "oklch(0.70 0.14 255)",
+          "oklch(0.84 0.07 255)",
+          "oklch(0.95 0.03 255)"
+        ]
+      },
+      "deep-ink": {
+        "role": "neutral",
+        "displayName": "Deep Ink",
+        "canonical": "oklch(0.13 0.025 255)",
+        "tonalRamp": [
+          "oklch(0.09 0.02 255)",
+          "oklch(0.13 0.025 255)",
+          "oklch(0.22 0.02 255)",
+          "oklch(0.35 0.018 255)",
+          "oklch(0.45 0.015 255)",
+          "oklch(0.55 0.02 255)",
+          "oklch(0.70 0.012 255)",
+          "oklch(0.85 0.007 255)",
+          "oklch(0.95 0.004 255)"
+        ]
+      },
+      "alert-red": {
+        "role": "destructive",
+        "displayName": "Alert Red",
+        "canonical": "oklch(0.577 0.245 27.325)",
+        "tonalRamp": [
+          "oklch(0.25 0.20 27)",
+          "oklch(0.35 0.22 27)",
+          "oklch(0.45 0.24 27)",
+          "oklch(0.52 0.245 27)",
+          "oklch(0.577 0.245 27)",
+          "oklch(0.67 0.20 27)",
+          "oklch(0.78 0.13 27)",
+          "oklch(0.89 0.07 27)",
+          "oklch(0.96 0.03 27)"
+        ]
+      },
+      "pure-white": {
+        "role": "neutral",
+        "displayName": "Pure White",
+        "canonical": "oklch(1 0 0)",
+        "tonalRamp": []
+      },
+      "pale-gather": {
+        "role": "neutral",
+        "displayName": "Pale Gather",
+        "canonical": "oklch(0.97 0.008 255)",
+        "tonalRamp": []
+      },
+      "quiet-slate": {
+        "role": "neutral",
+        "displayName": "Quiet Slate",
+        "canonical": "oklch(0.55 0.02 255)",
+        "tonalRamp": []
+      },
+      "chalk-line": {
+        "role": "neutral",
+        "displayName": "Chalk Line",
+        "canonical": "oklch(0.91 0.01 255)",
+        "tonalRamp": []
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Landing hero headline, vote result announcement. One per view maximum." },
+      "headline": { "displayName": "Headline", "purpose": "Page titles, section breaks, modal headers." },
+      "title": { "displayName": "Title", "purpose": "Card headings, form step labels, list section dividers." },
+      "body": { "displayName": "Body", "purpose": "Vote descriptions, candidate bios, helper text. Max 68ch line length." },
+      "label": { "displayName": "Label", "purpose": "Status chips, nav items, table headers, metadata. Sentence case." }
+    },
+    "shadows": [
+      {
+        "name": "lift",
+        "value": "0 1px 3px oklch(0 0 0 / 0.06), 0 1px 2px oklch(0 0 0 / 0.04)",
+        "purpose": "Hover-state lift on interactive rows and cards. Never at rest."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-standard",
+        "value": "cubic-bezier(0.0, 0.0, 0.2, 1.0)",
+        "purpose": "Default state transitions (border-color, background, opacity). 150ms."
+      },
+      {
+        "name": "ease-decelerate",
+        "value": "cubic-bezier(0.0, 0.0, 0.2, 1.0)",
+        "purpose": "Elements entering the screen (dialogs, toasts). 200ms."
+      }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "xl", "value": "1280px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Main CTA. Solid Assembly Blue. Used for: submit ballot, create vote, publish, confirm destructive action.",
+      "html": "<button class=\"ds-btn-primary\">Submit vote</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 32px; padding: 0 10px; background: oklch(0.49 0.21 255); color: #ffffff; border-radius: 8px; border: 1px solid transparent; font-family: 'Inter', ui-sans-serif, sans-serif; font-size: 14px; font-weight: 500; letter-spacing: 0; white-space: nowrap; cursor: pointer; transition: background 150ms cubic-bezier(0,0,0.2,1); outline: none; } .ds-btn-primary:hover { background: oklch(0.49 0.21 255 / 0.82); } .ds-btn-primary:focus-visible { border-color: oklch(0.49 0.21 255); box-shadow: 0 0 0 3px oklch(0.49 0.21 255 / 0.5); } .ds-btn-primary:disabled { opacity: 0.5; pointer-events: none; }"
+    },
+    {
+      "name": "Primary Button (Large)",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Voter-facing CTA. 44px tall for in-room phone tap targets.",
+      "html": "<button class=\"ds-btn-primary-lg\">Start for free</button>",
+      "css": ".ds-btn-primary-lg { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 44px; padding: 0 24px; background: oklch(0.49 0.21 255); color: #ffffff; border-radius: 10px; border: 1px solid transparent; font-family: 'Inter', ui-sans-serif, sans-serif; font-size: 15px; font-weight: 600; letter-spacing: 0; white-space: nowrap; cursor: pointer; transition: background 150ms cubic-bezier(0,0,0.2,1); outline: none; } .ds-btn-primary-lg:hover { background: oklch(0.49 0.21 255 / 0.82); } .ds-btn-primary-lg:focus-visible { box-shadow: 0 0 0 3px oklch(0.49 0.21 255 / 0.5); }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Tertiary actions. Nav items, row actions (View →), cancel in dialogs.",
+      "html": "<button class=\"ds-btn-ghost\">View →</button>",
+      "css": ".ds-btn-ghost { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 32px; padding: 0 10px; background: transparent; color: oklch(0.55 0.02 255); border: 1px solid transparent; border-radius: 8px; font-family: 'Inter', ui-sans-serif, sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; transition: background 150ms cubic-bezier(0,0,0.2,1), color 150ms cubic-bezier(0,0,0.2,1); outline: none; } .ds-btn-ghost:hover { background: oklch(0.97 0.008 255); color: oklch(0.13 0.025 255); } .ds-btn-ghost:focus-visible { box-shadow: 0 0 0 3px oklch(0.49 0.21 255 / 0.5); }"
+    },
+    {
+      "name": "Outline Button",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "Secondary action alongside a primary. Sign in, cancel, secondary nav.",
+      "html": "<button class=\"ds-btn-outline\">Sign in</button>",
+      "css": ".ds-btn-outline { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 32px; padding: 0 10px; background: #ffffff; color: oklch(0.13 0.025 255); border: 1px solid oklch(0.91 0.01 255); border-radius: 8px; font-family: 'Inter', ui-sans-serif, sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; transition: background 150ms cubic-bezier(0,0,0.2,1); outline: none; } .ds-btn-outline:hover { background: oklch(0.97 0.008 255); } .ds-btn-outline:focus-visible { border-color: oklch(0.49 0.21 255); box-shadow: 0 0 0 3px oklch(0.49 0.21 255 / 0.5); }"
+    },
+    {
+      "name": "Vote Row",
+      "kind": "card",
+      "refersTo": "vote-row",
+      "description": "Primary list item in the organizer dashboard. Entire row is a link.",
+      "html": "<a class=\"ds-vote-row\" href=\"#\"><div class=\"ds-vote-row__left\"><span class=\"ds-vote-row__dot ds-vote-row__dot--active\"></span><span class=\"ds-vote-row__title\">Annual General Meeting</span></div><div class=\"ds-vote-row__right\"><span class=\"ds-vote-row__count\">42 votes</span><span class=\"ds-vote-row__action\">View →</span></div></a>",
+      "css": ".ds-vote-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; background: #ffffff; border: 1px solid oklch(0.91 0.01 255); border-radius: 12px; text-decoration: none; color: inherit; transition: border-color 150ms cubic-bezier(0,0,0.2,1), box-shadow 150ms cubic-bezier(0,0,0.2,1); cursor: pointer; } .ds-vote-row:hover { border-color: oklch(0.49 0.21 255 / 0.3); box-shadow: 0 1px 3px oklch(0 0 0 / 0.06), 0 1px 2px oklch(0 0 0 / 0.04); } .ds-vote-row__left { display: flex; align-items: center; gap: 12px; min-width: 0; } .ds-vote-row__dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; background: oklch(0.64 0.17 152); } .ds-vote-row__dot--active { background: oklch(0.64 0.17 152); } .ds-vote-row__dot--draft { background: oklch(0.71 0 0); } .ds-vote-row__dot--closed { background: oklch(0.71 0 0); } .ds-vote-row__title { font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 500; color: oklch(0.13 0.025 255); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .ds-vote-row__right { display: flex; align-items: center; gap: 16px; flex-shrink: 0; margin-left: 16px; } .ds-vote-row__count { font-family: 'Inter', sans-serif; font-size: 14px; color: oklch(0.55 0.02 255); } .ds-vote-row__action { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500; color: oklch(0.55 0.02 255); transition: color 150ms; } .ds-vote-row:hover .ds-vote-row__action { color: oklch(0.49 0.21 255); }"
+    },
+    {
+      "name": "Nav Item (Active)",
+      "kind": "nav",
+      "refersTo": "nav-item-active",
+      "description": "Sidebar navigation item in active state. Uses Open Sky fill + Assembly Blue text.",
+      "html": "<a class=\"ds-nav-item ds-nav-item--active\" href=\"#\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><rect x=\"3\" y=\"3\" width=\"7\" height=\"7\"/><rect x=\"14\" y=\"3\" width=\"7\" height=\"7\"/><rect x=\"14\" y=\"14\" width=\"7\" height=\"7\"/><rect x=\"3\" y=\"14\" width=\"7\" height=\"7\"/></svg>My Votes</a>",
+      "css": ".ds-nav-item { display: flex; align-items: center; gap: 12px; padding: 8px 12px; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500; color: oklch(0.55 0.02 255); text-decoration: none; transition: background 150ms, color 150ms; cursor: pointer; } .ds-nav-item:hover { background: oklch(0.97 0.008 255); color: oklch(0.13 0.025 255); } .ds-nav-item--active { background: oklch(0.94 0.04 255); color: oklch(0.49 0.21 255); font-weight: 600; }"
+    },
+    {
+      "name": "Status Chip",
+      "kind": "chip",
+      "refersTo": "vote-row",
+      "description": "Inline status label for vote state. Pill shape, muted fill.",
+      "html": "<span class=\"ds-chip ds-chip--active\">Active</span> <span class=\"ds-chip ds-chip--draft\">Draft</span> <span class=\"ds-chip ds-chip--closed\">Closed</span>",
+      "css": ".ds-chip { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 9999px; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 500; } .ds-chip--active { background: oklch(0.93 0.07 152); color: oklch(0.38 0.13 152); } .ds-chip--draft { background: oklch(0.94 0.005 255); color: oklch(0.55 0.02 255); } .ds-chip--closed { background: oklch(0.94 0.005 255); color: oklch(0.55 0.02 255); }"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "vote-row",
+      "description": "Standard form input. Chalk Line border, white fill, Assembly Blue focus ring.",
+      "html": "<div class=\"ds-field\"><label class=\"ds-field__label\" for=\"f1\">Vote title</label><input class=\"ds-input\" id=\"f1\" type=\"text\" placeholder=\"e.g. Annual Board Election\" /></div>",
+      "css": ".ds-field { display: flex; flex-direction: column; gap: 6px; } .ds-field__label { font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500; color: oklch(0.13 0.025 255); } .ds-input { height: 36px; padding: 0 12px; background: #ffffff; border: 1px solid oklch(0.91 0.01 255); border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 15px; color: oklch(0.13 0.025 255); outline: none; transition: border-color 150ms, box-shadow 150ms; } .ds-input::placeholder { color: oklch(0.71 0.01 255); } .ds-input:focus { border-color: oklch(0.49 0.21 255); box-shadow: 0 0 0 3px oklch(0.49 0.21 255 / 0.5); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Village Square",
+    "overview": "Votely is not a SaaS tool. It is the room where a community makes a decision. The people inside it already know each other: they're in the same church, the same school, the same organization. The interface carries the weight of that moment without making it feel heavy. Light, open, honest — the way a well-organized public meeting feels before it starts.\n\nColor is restrained: Assembly Blue anchors trust and action; everything else is neutral so the ballot content, not the chrome, commands attention. Type is Inter at deliberately modest sizes. Depth is nearly flat. Surfaces are separated by fine chalk-line borders, not shadows.\n\nThis system explicitly rejects startup precision-noir and consumer-social theatrics. The Village Square is welcoming and purposeful, not cool or exciting.",
+    "keyCharacteristics": [
+      "White page, blue intention: pure white canvas with Assembly Blue reserved for interactive elements only",
+      "Flat-first surfaces: borders define hierarchy; shadows signal state change, never decoration",
+      "Prose-sized type: Inter at readable weights — the ballot should feel like a printed form, not an app pitch",
+      "One tap, clear consequence: every action state is unambiguous at arm's length",
+      "Plain language throughout: status and error copy written as a neighbor would say it, not as a status code"
+    ],
+    "rules": [
+      { "name": "The Assembly Voice Rule", "body": "Assembly Blue appears on interactive elements only and occupies less than 15% of any screen. Its rarity signals authority.", "section": "colors" },
+      { "name": "The Tint Direction Rule", "body": "Every neutral is tinted toward blue (hue 255), not toward warm. No cream, sand, or parchment.", "section": "colors" },
+      { "name": "The Flat-First Rule", "body": "At rest, a surface has a Chalk Line border OR nothing. Shadow appears only on hover/active state. Never both border and shadow simultaneously.", "section": "elevation" },
+      { "name": "The Weight Contrast Rule", "body": "Heading over body must have at least a 1-step weight jump. Two 400-weight elements at different sizes do not make hierarchy.", "section": "typography" },
+      { "name": "The Floor Rule", "body": "Minimum rendered body font size is 16px on voter-facing screens. Nothing below 12px in any active context.", "section": "typography" }
+    ],
+    "dos": [
+      "Do use Assembly Blue for interactive elements only. A blue headline or blue background section are both prohibited.",
+      "Do write every voter-facing error state as a person would say it. 'You're not at the venue' over 'Geo-validation failed.'",
+      "Do use the Chalk Line border as the primary separation tool. Reserve shadows for interactive lift states.",
+      "Do keep ballot tap targets a minimum of 64px tall on voter-facing screens.",
+      "Do use Inter's weight contrast (700+ over 400) to communicate hierarchy.",
+      "Do use text-wrap: balance on all h1–h3 elements."
+    ],
+    "donts": [
+      "Don't use startup-generic aesthetics: no dark sidebar, no monospaced display type, no over-minimal chrome.",
+      "Don't use consumer-social polling patterns: no gradient hero numbers, no animated vote counters, no emoji reactions.",
+      "Don't use border-left or border-right greater than 1px as a colored side-stripe accent.",
+      "Don't use background-clip: text with any gradient.",
+      "Don't use border-radius above 16px on cards, vote rows, or inputs.",
+      "Don't use Assembly Blue and shadow-sm on the same element at rest.",
+      "Don't use cream, sand, beige, or warm-tinted neutral backgrounds.",
+      "Don't add uppercase tracked eyebrow labels above every section heading.",
+      "Don't use letter-spacing tighter than -0.04em on any text.",
+      "Don't gate voter-facing content visibility on animation class triggers."
+    ]
+  }
+}
