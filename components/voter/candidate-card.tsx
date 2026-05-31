@@ -21,12 +21,8 @@ interface CandidateCardProps {
 export function CandidateCard({ candidate, selected, onClick, disabled }: CandidateCardProps) {
   const [imgIdx, setImgIdx] = useState(0)
   const images = candidate.photoUrls
+  const hasPhoto = images.length > 0
   const hasMultiple = images.length > 1
-
-  function goTo(i: number, e: React.MouseEvent) {
-    e.stopPropagation()
-    setImgIdx(i)
-  }
 
   function prev(e: React.MouseEvent) {
     e.stopPropagation()
@@ -47,30 +43,32 @@ export function CandidateCard({ candidate, selected, onClick, disabled }: Candid
       className={cn(
         "relative block w-full aspect-[3/4] rounded-2xl overflow-hidden",
         "transition-all duration-200 outline-none",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
         selected
-          ? "ring-2 ring-primary shadow-[0_0_28px_oklch(0.48_0.26_293_/_0.45)]"
-          : "ring-1 ring-white/10 hover:ring-white/25",
+          ? "ring-2 ring-primary shadow-[0_0_12px_oklch(0.49_0.21_255_/_0.22)]"
+          : "ring-1 ring-black/8 hover:ring-black/16",
         disabled && "opacity-40 pointer-events-none"
       )}
     >
-      {/* Photo */}
-      {images.length > 0 ? (
+      {/* Photo or muted fallback */}
+      {hasPhoto ? (
         <img
           src={images[imgIdx]}
           alt={candidate.name}
           className="absolute inset-0 w-full h-full object-cover object-top"
         />
       ) : (
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/25 via-primary/10 to-transparent flex items-center justify-center">
-          <span className="text-6xl font-black text-primary/50 select-none">
+        <div className="absolute inset-0 bg-slate-100 flex items-center justify-center">
+          <span className="text-6xl font-black text-primary/35 select-none leading-none">
             {candidate.name.charAt(0).toUpperCase()}
           </span>
         </div>
       )}
 
-      {/* Full-card dark gradient scrim */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/25 to-black/5" />
+      {/* Scrim — only rendered when there's a photo */}
+      {hasPhoto && (
+        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
+      )}
 
       {/* Story-style image count dots */}
       {hasMultiple && (
@@ -80,11 +78,7 @@ export function CandidateCard({ candidate, selected, onClick, disabled }: Candid
               key={i}
               className={cn(
                 "flex-1 h-[3px] rounded-full transition-all duration-200",
-                i < imgIdx
-                  ? "bg-white"
-                  : i === imgIdx
-                    ? "bg-white"
-                    : "bg-white/30"
+                i === imgIdx ? "bg-white" : "bg-white/35"
               )}
             />
           ))}
@@ -94,33 +88,40 @@ export function CandidateCard({ candidate, selected, onClick, disabled }: Candid
       {/* Invisible tap zones for multi-image navigation */}
       {hasMultiple && (
         <>
-          <div
-            onClick={prev}
-            className="absolute inset-y-0 left-0 w-2/5 z-10"
-          />
-          <div
-            onClick={next}
-            className="absolute inset-y-0 right-0 w-2/5 z-10"
-          />
+          <div onClick={prev} className="absolute inset-y-0 left-0 w-2/5 z-10" />
+          <div onClick={next} className="absolute inset-y-0 right-0 w-2/5 z-10" />
         </>
       )}
 
       {/* Selection badge */}
       {selected && (
-        <div className="absolute top-3 right-3 size-7 rounded-full bg-primary flex items-center justify-center shadow-lg z-20">
-          <Check className="size-3.5 text-primary-foreground" strokeWidth={3} />
+        <div className="absolute top-3 right-3 size-7 rounded-full bg-primary flex items-center justify-center shadow-sm z-20">
+          <Check className="size-3.5 text-white" strokeWidth={3} />
         </div>
       )}
 
-      {/* Name + bio overlaid on scrim */}
-      <div className="absolute inset-x-0 bottom-0 px-3 pb-3 pt-8 z-20">
-        <p className="text-white font-bold text-sm leading-snug">{candidate.name}</p>
-        {candidate.bio && (
-          <p className="text-white/60 text-[11px] mt-0.5 line-clamp-2 leading-relaxed">
-            {candidate.bio}
+      {/* Name + bio — on photo: overlaid on scrim; no photo: below center */}
+      {hasPhoto ? (
+        <div className="absolute inset-x-0 bottom-0 px-3 pb-3 pt-8 z-20">
+          <p className="text-white font-semibold text-sm leading-snug">{candidate.name}</p>
+          {candidate.bio && (
+            <p className="text-white/65 text-[11px] mt-0.5 line-clamp-2 leading-relaxed">
+              {candidate.bio}
+            </p>
+          )}
+        </div>
+      ) : (
+        <div className="absolute inset-x-0 bottom-0 px-3 pb-3 z-20">
+          <p className="text-slate-800 font-semibold text-sm leading-snug text-center">
+            {candidate.name}
           </p>
-        )}
-      </div>
+          {candidate.bio && (
+            <p className="text-slate-500 text-[11px] mt-0.5 line-clamp-2 leading-relaxed text-center">
+              {candidate.bio}
+            </p>
+          )}
+        </div>
+      )}
     </button>
   )
 }

@@ -35,41 +35,46 @@ function SortableItem({ candidate, rank }: SortableItemProps) {
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition }}
       className={cn(
-        "flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.04] p-2.5 transition-all",
-        isDragging && "shadow-xl border-primary/40 bg-white/8 scale-[1.02]"
+        "flex items-center gap-3 rounded-xl border bg-white p-2.5 transition-all",
+        isDragging
+          ? "border-primary/40 bg-slate-50 scale-[1.02] shadow-md z-10"
+          : "border-border shadow-[0_1px_2px_oklch(0_0_0_/_0.04)]"
       )}
     >
       {/* Drag handle */}
       <button
         type="button"
-        className="touch-none cursor-grab active:cursor-grabbing text-white/25 hover:text-white/60 transition-colors p-1 -ml-0.5 shrink-0"
+        className="touch-none cursor-grab active:cursor-grabbing text-slate-300 hover:text-slate-500 transition-colors p-1 -ml-0.5 shrink-0"
         {...attributes}
         {...listeners}
+        aria-label="Drag to reorder"
       >
         <GripVertical className="size-5" />
       </button>
 
       {/* Rank badge */}
-      <span className="size-7 flex shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-black">
+      <span className="size-7 flex shrink-0 items-center justify-center rounded-full bg-primary text-white text-xs font-bold">
         {rank}
       </span>
 
-      {/* Photo */}
+      {/* Photo or initial */}
       {candidate.photoUrls.length > 0 ? (
         <img
           src={candidate.photoUrls[0]}
           alt={candidate.name}
-          className="size-14 rounded-xl object-cover object-top shrink-0"
+          className="size-12 rounded-lg object-cover object-top shrink-0"
         />
       ) : (
-        <div className="size-14 shrink-0 rounded-xl bg-gradient-to-br from-primary/20 to-transparent flex items-center justify-center text-lg font-black text-primary/60">
-          {candidate.name.charAt(0).toUpperCase()}
+        <div className="size-12 shrink-0 rounded-lg bg-slate-100 flex items-center justify-center">
+          <span className="text-base font-bold text-primary/40 select-none">
+            {candidate.name.charAt(0).toUpperCase()}
+          </span>
         </div>
       )}
 
       {/* Info */}
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-bold truncate">{candidate.name}</p>
+        <p className="text-sm font-semibold text-slate-800 truncate">{candidate.name}</p>
         {candidate.bio && (
           <p className="text-xs text-muted-foreground truncate mt-0.5">{candidate.bio}</p>
         )}
@@ -106,7 +111,7 @@ export function RankedChoice({ candidates, ranked, onChange }: Props) {
 
   return (
     <div className="space-y-2.5">
-      <p className="text-[11px] font-semibold text-muted-foreground px-1">
+      <p className="text-xs text-muted-foreground px-0.5">
         Hold and drag to reorder
       </p>
       <DndContext

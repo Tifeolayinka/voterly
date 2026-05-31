@@ -3,7 +3,6 @@
 import { useState } from "react"
 import { useMutation } from "convex/react"
 import { api } from "@/convex/_generated/api"
-import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight, Check } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { SingleChoice } from "./single-choice"
@@ -53,12 +52,6 @@ function getFingerprint(): string {
     sessionStorage.setItem(key, fp)
   }
   return fp
-}
-
-const TYPE_LABEL: Record<string, string> = {
-  single: "Choose one",
-  multiple: "Choose up to",
-  ranked: "Rank all",
 }
 
 interface Props {
@@ -121,14 +114,14 @@ export function BallotShell({ vote, positions, voterLat, voterLng }: Props) {
 
   if (state === "already_voted") {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center px-6 text-center gap-5">
+      <div className="min-h-dvh flex flex-col items-center justify-center px-6 text-center gap-5">
         <div className="size-16 rounded-2xl bg-primary/10 flex items-center justify-center">
           <Check className="size-7 text-primary" strokeWidth={2.5} />
         </div>
         <div className="space-y-2">
-          <h1 className="text-2xl font-black tracking-tight">Already voted</h1>
+          <h1 className="text-2xl font-bold tracking-tight">Already voted</h1>
           <p className="text-sm text-muted-foreground max-w-xs leading-relaxed">
-            Your vote has already been recorded for this election.
+            Your vote has already been recorded for <span className="font-medium text-foreground">{vote.title}</span>.
           </p>
         </div>
       </div>
@@ -150,35 +143,34 @@ export function BallotShell({ vote, positions, voterLat, voterLng }: Props) {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-dvh flex flex-col">
       {/* ─── Sticky header ─── */}
-      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-md border-b border-white/8 px-4 pt-3 pb-3">
+      <div className="sticky top-0 z-10 bg-background/90 backdrop-blur-sm border-b border-border px-4 pt-3 pb-3">
         <div className="max-w-lg mx-auto space-y-2.5">
           {/* Vote title */}
-          <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground truncate">
-            {vote.title}
-          </p>
+          <p className="text-xs font-semibold text-muted-foreground truncate">{vote.title}</p>
 
-          {/* Story-style segment bars */}
-          <div className="flex items-center gap-1.5">
+          {/* Progress segment bars */}
+          <div className="flex items-center gap-2">
             <div className="flex flex-1 gap-1">
               {positions.map((pos, i) => (
                 <button
                   key={pos._id}
                   type="button"
                   onClick={() => setCurrentIdx(i)}
+                  aria-label={`Go to position ${i + 1}: ${pos.title}`}
                   className={cn(
                     "flex-1 h-[3px] rounded-full transition-all duration-300",
                     i < currentIdx
-                      ? "bg-white"
+                      ? "bg-primary/50"
                       : i === currentIdx
                         ? "bg-primary"
-                        : "bg-white/20"
+                        : "bg-slate-200"
                   )}
                 />
               ))}
             </div>
-            <span className="shrink-0 text-[11px] font-semibold text-muted-foreground tabular-nums ml-1">
+            <span className="shrink-0 text-xs font-semibold text-muted-foreground tabular-nums">
               {currentIdx + 1}/{positions.length}
             </span>
           </div>
@@ -187,22 +179,23 @@ export function BallotShell({ vote, positions, voterLat, voterLng }: Props) {
 
       {/* ─── Position content ─── */}
       <div className="flex-1 px-4 pt-7 pb-28">
-        <div className="max-w-lg mx-auto space-y-6">
+        <div className="max-w-lg mx-auto space-y-5">
           {current && (
             <>
               {/* Position header */}
-              <div className="space-y-1">
-                <h2 className="text-2xl font-black tracking-tight leading-tight">
+              <div className="space-y-2">
+                <h2
+                  className="text-2xl font-bold tracking-tight leading-tight"
+                  style={{ textWrap: "balance" } as React.CSSProperties}
+                >
                   {current.title}
                 </h2>
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/8 border border-white/10">
-                  <span className="text-[11px] font-semibold text-muted-foreground">
-                    {current.votingType === "single" && "Single choice"}
-                    {current.votingType === "multiple" &&
-                      `Choose up to ${current.maxSelections ?? current.candidates.length}`}
-                    {current.votingType === "ranked" && "Drag to rank all"}
-                  </span>
-                </div>
+                <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-muted border border-border text-xs font-medium text-muted-foreground">
+                  {current.votingType === "single" && "Choose one"}
+                  {current.votingType === "multiple" &&
+                    `Choose up to ${current.maxSelections ?? current.candidates.length}`}
+                  {current.votingType === "ranked" && "Drag to rank all"}
+                </span>
               </div>
 
               {current.votingType === "single" && (
@@ -212,7 +205,6 @@ export function BallotShell({ vote, positions, voterLat, voterLng }: Props) {
                   onChange={(id) => setSelection(current._id, [id])}
                 />
               )}
-
               {current.votingType === "multiple" && (
                 <MultipleChoice
                   candidates={current.candidates}
@@ -221,7 +213,6 @@ export function BallotShell({ vote, positions, voterLat, voterLng }: Props) {
                   onChange={(ids) => setSelection(current._id, ids)}
                 />
               )}
-
               {current.votingType === "ranked" && (
                 <RankedChoice
                   candidates={current.candidates}
@@ -235,20 +226,24 @@ export function BallotShell({ vote, positions, voterLat, voterLng }: Props) {
       </div>
 
       {/* ─── Sticky footer nav ─── */}
-      <div className="fixed bottom-0 inset-x-0 bg-background/95 backdrop-blur-md border-t border-white/8 px-4 py-3 safe-area-pb">
+      <div
+        className="fixed bottom-0 inset-x-0 bg-background/90 backdrop-blur-sm border-t border-border px-4"
+        style={{ paddingTop: "12px", paddingBottom: "max(12px, env(safe-area-inset-bottom))" }}
+      >
         <div className="max-w-lg mx-auto flex items-center gap-3">
           {/* Back */}
           <button
             type="button"
             disabled={currentIdx === 0}
             onClick={() => setCurrentIdx((i) => i - 1)}
+            aria-label="Previous position"
             className={cn(
-              "size-12 rounded-xl flex items-center justify-center border border-white/12 bg-white/6 transition-all",
+              "size-12 rounded-xl flex items-center justify-center border border-border bg-background transition-all",
               "disabled:opacity-30 disabled:pointer-events-none",
-              "hover:bg-white/10 active:scale-95"
+              "hover:bg-muted active:scale-[0.97]"
             )}
           >
-            <ChevronLeft className="size-5" />
+            <ChevronLeft className="size-5 text-foreground" />
           </button>
 
           {/* Primary CTA */}
@@ -256,9 +251,9 @@ export function BallotShell({ vote, positions, voterLat, voterLng }: Props) {
             <button
               type="button"
               onClick={() => setCurrentIdx((i) => i + 1)}
-              className="flex-1 h-12 rounded-xl bg-primary hover:bg-primary/90 active:scale-[0.98] transition-all flex items-center justify-center gap-2 font-semibold text-primary-foreground text-sm"
+              className="flex-1 h-12 rounded-xl bg-primary hover:bg-primary/88 active:scale-[0.98] transition-all flex items-center justify-center gap-2 font-semibold text-white text-sm"
             >
-              Next position
+              Next
               <ChevronRight className="size-4" />
             </button>
           ) : (
@@ -269,11 +264,13 @@ export function BallotShell({ vote, positions, voterLat, voterLng }: Props) {
               className={cn(
                 "flex-1 h-12 rounded-xl transition-all flex items-center justify-center gap-2 font-semibold text-sm",
                 allComplete
-                  ? "bg-primary hover:bg-primary/90 active:scale-[0.98] text-primary-foreground shadow-[0_0_20px_oklch(0.48_0.26_293_/_0.4)]"
-                  : "bg-white/8 text-muted-foreground pointer-events-none"
+                  ? "bg-primary hover:bg-primary/88 active:scale-[0.98] text-white"
+                  : "bg-muted text-muted-foreground pointer-events-none"
               )}
             >
-              {allComplete ? "Review & submit" : `${completedCount}/${positions.length} complete`}
+              {allComplete
+                ? "Review & submit"
+                : `${completedCount} of ${positions.length} complete`}
             </button>
           )}
         </div>

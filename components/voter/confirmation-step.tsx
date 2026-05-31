@@ -1,4 +1,5 @@
-import { Button } from "@/components/ui/button"
+"use client"
+
 import { ChevronLeft, Loader2, AlertCircle } from "lucide-react"
 import type { Doc } from "@/convex/_generated/dataModel"
 import type { BallotPosition } from "./ballot-shell"
@@ -23,22 +24,20 @@ export function ConfirmationStep({
   onConfirm,
 }: Props) {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-dvh flex flex-col">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-md border-b border-white/8 px-4 py-3.5">
+      <div className="sticky top-0 z-10 bg-background/90 backdrop-blur-sm border-b border-border px-4 py-3.5">
         <div className="max-w-lg mx-auto">
-          <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
-            {vote.title}
-          </p>
-          <p className="text-sm font-bold mt-0.5">Review your ballot</p>
+          <p className="text-xs text-muted-foreground">{vote.title}</p>
+          <p className="text-sm font-semibold mt-0.5 text-foreground">Review your ballot</p>
         </div>
       </div>
 
       {/* Scroll area */}
-      <div className="flex-1 px-4 py-7 pb-28 max-w-lg mx-auto w-full space-y-5">
+      <div className="flex-1 px-4 py-6 pb-28 max-w-lg mx-auto w-full space-y-4">
         {errorMsg && (
-          <div className="flex items-start gap-3 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">
-            <AlertCircle className="size-4 mt-0.5 shrink-0" />
+          <div className="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            <AlertCircle className="size-4 mt-0.5 shrink-0 text-red-500" />
             <span>{errorMsg}</span>
           </div>
         )}
@@ -46,22 +45,24 @@ export function ConfirmationStep({
         {positions.map((position) => {
           const sel = selections[position._id] ?? []
           const candidateMap = Object.fromEntries(position.candidates.map((c) => [c._id, c]))
+          const typeLabel =
+            position.votingType === "ranked"
+              ? "Ranked choice"
+              : position.votingType === "multiple"
+                ? "Multiple choice"
+                : "Single choice"
 
           return (
             <div
               key={position._id}
-              className="rounded-2xl border border-white/10 bg-white/[0.03] overflow-hidden"
+              className="rounded-xl border border-border bg-white overflow-hidden"
             >
               {/* Position header */}
-              <div className="px-4 pt-4 pb-3 border-b border-white/8">
-                <span className="text-[10px] font-semibold uppercase tracking-widest text-primary/80">
-                  {position.votingType === "ranked"
-                    ? "Ranked"
-                    : position.votingType === "multiple"
-                      ? "Multiple choice"
-                      : "Single choice"}
-                </span>
-                <h3 className="font-bold text-sm mt-0.5">{position.title}</h3>
+              <div className="px-4 pt-3.5 pb-3 border-b border-border bg-slate-50/60">
+                <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                  {typeLabel}
+                </p>
+                <h3 className="font-semibold text-sm mt-0.5 text-foreground">{position.title}</h3>
               </div>
 
               {/* Selections */}
@@ -73,7 +74,7 @@ export function ConfirmationStep({
                   return (
                     <div key={id} className="flex items-center gap-3">
                       {position.votingType === "ranked" && (
-                        <span className="size-6 flex shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground text-[11px] font-black">
+                        <span className="size-6 flex shrink-0 items-center justify-center rounded-full bg-primary text-white text-[11px] font-bold">
                           {idx + 1}
                         </span>
                       )}
@@ -81,14 +82,18 @@ export function ConfirmationStep({
                         <img
                           src={photo}
                           alt={c.name}
-                          className="size-10 rounded-xl object-cover object-top shrink-0"
+                          className="size-10 rounded-lg object-cover object-top shrink-0"
                         />
                       ) : (
-                        <div className="size-10 shrink-0 rounded-xl bg-primary/10 flex items-center justify-center text-xs font-black text-primary/60">
-                          {c.name.charAt(0).toUpperCase()}
+                        <div className="size-10 shrink-0 rounded-lg bg-slate-100 flex items-center justify-center">
+                          <span className="text-xs font-bold text-primary/40 select-none">
+                            {c.name.charAt(0).toUpperCase()}
+                          </span>
                         </div>
                       )}
-                      <span className="text-sm font-semibold flex-1 truncate">{c.name}</span>
+                      <span className="text-sm font-medium flex-1 truncate text-foreground">
+                        {c.name}
+                      </span>
                     </div>
                   )
                 })}
@@ -97,28 +102,31 @@ export function ConfirmationStep({
           )
         })}
 
-        {/* Disclaimer */}
-        <p className="text-[11px] text-muted-foreground text-center leading-relaxed px-4">
+        <p className="text-xs text-muted-foreground text-center leading-relaxed px-4">
           Once submitted, your ballot cannot be changed.
         </p>
       </div>
 
       {/* Footer */}
-      <div className="fixed bottom-0 inset-x-0 bg-background/95 backdrop-blur-md border-t border-white/8 px-4 py-3">
+      <div
+        className="fixed bottom-0 inset-x-0 bg-background/90 backdrop-blur-sm border-t border-border px-4"
+        style={{ paddingTop: "12px", paddingBottom: "max(12px, env(safe-area-inset-bottom))" }}
+      >
         <div className="max-w-lg mx-auto flex gap-3">
           <button
             type="button"
             onClick={onBack}
             disabled={isSubmitting}
-            className="size-12 rounded-xl flex items-center justify-center border border-white/12 bg-white/6 transition-all disabled:opacity-30 hover:bg-white/10 active:scale-95"
+            aria-label="Go back to ballot"
+            className="size-12 rounded-xl flex items-center justify-center border border-border bg-background transition-all disabled:opacity-30 hover:bg-muted active:scale-[0.97]"
           >
-            <ChevronLeft className="size-5" />
+            <ChevronLeft className="size-5 text-foreground" />
           </button>
           <button
             type="button"
             onClick={onConfirm}
             disabled={isSubmitting}
-            className="flex-1 h-12 rounded-xl bg-primary hover:bg-primary/90 active:scale-[0.98] transition-all flex items-center justify-center gap-2 font-semibold text-primary-foreground text-sm disabled:opacity-60 disabled:pointer-events-none shadow-[0_0_20px_oklch(0.48_0.26_293_/_0.35)]"
+            className="flex-1 h-12 rounded-xl bg-primary hover:bg-primary/88 active:scale-[0.98] transition-all flex items-center justify-center gap-2 font-semibold text-white text-sm disabled:opacity-60 disabled:pointer-events-none"
           >
             {isSubmitting ? (
               <>

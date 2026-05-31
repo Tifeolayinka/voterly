@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils"
 import { CandidateCard, type BallotCandidate } from "./candidate-card"
 
 interface Props {
@@ -16,20 +17,20 @@ export function MultipleChoice({ candidates, selected, maxSelections, onChange }
     }
   }
 
+  const atMax = selected.length >= maxSelections
+
   return (
     <div className="space-y-4">
-      {/* Selection counter pill */}
       <div className="flex items-center">
         <div
-          className={
+          className={cn(
+            "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold border",
             selected.length > 0
-              ? "inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/15 border border-primary/25 text-[11px] font-semibold text-primary"
-              : "inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/6 border border-white/10 text-[11px] font-semibold text-muted-foreground"
-          }
+              ? "bg-primary/8 border-primary/20 text-primary"
+              : "bg-muted border-border text-muted-foreground"
+          )}
         >
-          <span className="tabular-nums">
-            {selected.length} / {maxSelections}
-          </span>
+          <span className="tabular-nums">{selected.length} / {maxSelections}</span>
           <span>selected</span>
         </div>
       </div>
@@ -37,13 +38,12 @@ export function MultipleChoice({ candidates, selected, maxSelections, onChange }
       <div className="grid grid-cols-2 gap-3">
         {candidates.map((candidate) => {
           const isSelected = selected.includes(candidate._id)
-          const atMax = selected.length >= maxSelections && !isSelected
           return (
             <CandidateCard
               key={candidate._id}
               candidate={candidate}
               selected={isSelected}
-              disabled={atMax}
+              disabled={atMax && !isSelected}
               onClick={() => toggle(candidate._id)}
             />
           )
@@ -52,3 +52,4 @@ export function MultipleChoice({ candidates, selected, maxSelections, onChange }
     </div>
   )
 }
+
