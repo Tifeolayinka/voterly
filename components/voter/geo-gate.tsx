@@ -193,21 +193,23 @@ export function GeoGate({ vote, positions }: Props) {
     )
   }
 
+  const retryButton = (
+    <button
+      type="button"
+      onClick={requestLocation}
+      className="mt-1 h-11 px-6 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 active:scale-[0.98] transition-all font-semibold text-sm text-slate-700 shadow-sm"
+    >
+      Try again
+    </button>
+  )
+
   if (status === "timeout") {
     return (
       <Screen
-        icon={<WifiOff className="size-7 text-muted-foreground" />}
+        icon={<WifiOff className="size-7 text-slate-400" />}
         title="Location timed out"
         body="Couldn't get a location fix in time. On Mac, make sure Wi-Fi is on (it's used for location even without a network). On mobile, step outside or to an area with better signal."
-        action={
-          <button
-            type="button"
-            onClick={requestLocation}
-            className="mt-1 h-11 px-6 rounded-xl border border-white/12 bg-white/6 hover:bg-white/10 active:scale-[0.98] transition-all font-semibold text-sm"
-          >
-            Try again
-          </button>
-        }
+        action={retryButton}
       />
     )
   }
@@ -215,18 +217,10 @@ export function GeoGate({ vote, positions }: Props) {
   if (status === "unavailable") {
     return (
       <Screen
-        icon={<WifiOff className="size-7 text-muted-foreground" />}
+        icon={<WifiOff className="size-7 text-slate-400" />}
         title="Couldn't verify location"
         body="Your device can't determine your location. Check that location is enabled for your browser in your device's system settings (not just the browser prompt), then try again."
-        action={
-          <button
-            type="button"
-            onClick={requestLocation}
-            className="mt-1 h-11 px-6 rounded-xl border border-white/12 bg-white/6 hover:bg-white/10 active:scale-[0.98] transition-all font-semibold text-sm"
-          >
-            Try again
-          </button>
-        }
+        action={retryButton}
       />
     )
   }
