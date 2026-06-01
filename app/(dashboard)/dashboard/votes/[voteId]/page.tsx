@@ -290,7 +290,7 @@ export default function VoteDetailPage() {
   const selectedResult = results?.[selectedTab]
 
   return (
-    <div className="p-6 md:p-8 max-w-4xl mx-auto space-y-6">
+    <div className="p-6 md:p-8 space-y-6">
 
       {/* ── Breadcrumb ── */}
       <div className="flex items-center gap-1.5 text-[12.5px] text-muted-foreground">
