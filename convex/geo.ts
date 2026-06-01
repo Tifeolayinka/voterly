@@ -32,6 +32,16 @@ export const checkGeoAccess = query({
   },
 });
 
+export const getGeoConfig = query({
+  args: { voteId: v.id("votes") },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("geoConfig")
+      .withIndex("by_vote", (q) => q.eq("voteId", args.voteId))
+      .unique();
+  },
+});
+
 export const saveGeoConfig = mutation({
   args: {
     voteId: v.id("votes"),

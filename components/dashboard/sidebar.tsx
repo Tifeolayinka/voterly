@@ -89,7 +89,7 @@ export function DashboardSidebar() {
         <div>
           <p className="text-[11px] font-semibold text-slate-400 px-3 pb-1.5">Actions</p>
           <button
-            onClick={openDrawer}
+            onClick={() => openDrawer()}
             className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13.5px] font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100/70 transition-colors text-left"
           >
             <Plus className="h-[15px] w-[15px] shrink-0" />
@@ -145,7 +145,7 @@ export function MobileTopBar() {
           <LayoutDashboard className="h-4 w-4" />
         </Link>
         <button
-          onClick={openDrawer}
+          onClick={() => openDrawer()}
           className="p-2 rounded-lg text-slate-400 hover:text-slate-900 hover:bg-slate-50 transition-colors"
           aria-label="New Vote"
         >

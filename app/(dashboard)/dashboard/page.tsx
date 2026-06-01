@@ -111,7 +111,7 @@ function DashboardHeader() {
         <h1 className="text-[22px] font-bold tracking-tight text-foreground">My Votes</h1>
         <p className="text-[13.5px] text-muted-foreground mt-0.5">Create and manage your voting events.</p>
       </div>
-      <Button onClick={openDrawer} className="gap-1.5 rounded-lg font-semibold shrink-0">
+      <Button onClick={() => openDrawer()} className="gap-1.5 rounded-lg font-semibold shrink-0">
         <Plus data-icon="inline-start" />
         New Vote
       </Button>
@@ -236,7 +236,7 @@ function EmptyState() {
           Create your first voting event and share a ballot link with attendees.
         </p>
       </div>
-      <Button onClick={openDrawer} className="gap-1.5 rounded-lg font-semibold">
+      <Button onClick={() => openDrawer()} className="gap-1.5 rounded-lg font-semibold">
         <Plus data-icon="inline-start" />
         Create your first vote
       </Button>

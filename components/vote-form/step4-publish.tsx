@@ -18,6 +18,7 @@ export interface Step4Ref {
 
 interface Props {
   voteId: Id<"votes">
+  voteStatus?: "draft" | "active" | "closed"
   accessControl: AccessControlData
   geoConfig: GeoConfig | null
   showResultsToVoters: boolean
@@ -29,6 +30,7 @@ interface Props {
 
 export const Step4Publish = forwardRef<Step4Ref, Props>(function Step4Publish({
   voteId,
+  voteStatus,
   accessControl,
   geoConfig,
   showResultsToVoters,
@@ -42,38 +44,57 @@ export const Step4Publish = forwardRef<Step4Ref, Props>(function Step4Publish({
   const [publishedSlug, setPublishedSlug] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
 
-  const publishVote = useMutation(api.votes.publishVote)
+  const isUpdateMode = voteStatus === "active" || voteStatus === "closed"
+
+  const publishVote   = useMutation(api.votes.publishVote)
+  const updateVote    = useMutation(api.votes.updateVote)
   const saveGeoConfig = useMutation(api.geo.saveGeoConfig)
   const positions = useQuery(api.positions.getPositionsWithCandidates, { voteId })
 
   const totalCandidates =
     positions?.reduce((sum, p) => sum + p.candidates.length, 0) ?? 0
 
-  async function handlePublish() {
+  async function handleSaveOrPublish() {
     setError("")
     setPublishing(true)
     try {
-      const slug = await publishVote({ voteId, showResultsToVoters, accessControl })
-      if (accessControl.geoEnabled && geoConfig) {
-        await saveGeoConfig({
-          voteId,
-          lat: geoConfig.lat,
-          lng: geoConfig.lng,
-          radiusMetres: geoConfig.radiusMetres,
-          venueName: geoConfig.venueName || undefined,
-        })
+      if (isUpdateMode) {
+        // Editing an already-published vote: update settings without re-publishing
+        await updateVote({ voteId, showResultsToVoters, accessControl })
+        if (accessControl.geoEnabled && geoConfig) {
+          await saveGeoConfig({
+            voteId,
+            lat: geoConfig.lat,
+            lng: geoConfig.lng,
+            radiusMetres: geoConfig.radiusMetres,
+            venueName: geoConfig.venueName || undefined,
+          })
+        }
+        setPublishedSlug("__saved__")
+        onPublish?.("__saved__")
+      } else {
+        const slug = await publishVote({ voteId, showResultsToVoters, accessControl })
+        if (accessControl.geoEnabled && geoConfig) {
+          await saveGeoConfig({
+            voteId,
+            lat: geoConfig.lat,
+            lng: geoConfig.lng,
+            radiusMetres: geoConfig.radiusMetres,
+            venueName: geoConfig.venueName || undefined,
+          })
+        }
+        setPublishedSlug(slug)
+        onPublish?.(slug)
       }
-      setPublishedSlug(slug)
-      onPublish?.(slug)
     } catch {
-      setError("Failed to publish. Please try again.")
+      setError(isUpdateMode ? "Failed to save changes. Please try again." : "Failed to publish. Please try again.")
     } finally {
       setPublishing(false)
     }
   }
 
   useImperativeHandle(ref, () => ({
-    submit: handlePublish,
+    submit: handleSaveOrPublish,
     isPublished: () => !!publishedSlug,
   }))
 
@@ -81,6 +102,22 @@ export const Step4Publish = forwardRef<Step4Ref, Props>(function Step4Publish({
     await navigator.clipboard.writeText(url)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
+  }
+
+  if (publishedSlug === "__saved__") {
+    return (
+      <div className="py-8 flex flex-col items-center gap-5 text-center">
+        <div className="size-14 rounded-full bg-primary/10 flex items-center justify-center">
+          <Check className="h-7 w-7 text-primary" />
+        </div>
+        <div>
+          <h2 className="text-[18px] font-bold text-foreground">Changes saved</h2>
+          <p className="text-muted-foreground text-sm mt-1">
+            Your vote settings have been updated.
+          </p>
+        </div>
+      </div>
+    )
   }
 
   if (publishedSlug) {

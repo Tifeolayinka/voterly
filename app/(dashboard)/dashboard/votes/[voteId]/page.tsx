@@ -16,9 +16,11 @@ import {
   AlertTriangle,
   Loader2,
   BarChart3,
+  Pencil,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { Id, Doc } from "@/convex/_generated/dataModel"
+import { useVoteDrawer } from "@/components/dashboard/vote-drawer-context"
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -221,6 +223,7 @@ export default function VoteDetailPage() {
   const closeVote  = useMutation(api.votes.closeVote)
   const reopenVote = useMutation(api.votes.reopenVote)
   const deleteVote = useMutation(api.votes.deleteVote)
+  const { openDrawer } = useVoteDrawer()
 
   const [selectedTab,   setSelectedTab]   = useState(0)
   const [pendingAction, setPendingAction] = useState<PendingAction | null>(null)
@@ -331,6 +334,15 @@ export default function VoteDetailPage() {
 
         {/* Action bar */}
         <div className="flex items-center gap-2 flex-wrap">
+          <button
+            type="button"
+            onClick={() => openDrawer(vote._id)}
+            className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg border border-border bg-background hover:bg-muted text-[12.5px] font-medium text-foreground transition-all"
+          >
+            <Pencil className="size-3.5" />
+            Edit
+          </button>
+
           {vote.slug && (
             <>
               <button
