@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import { internal } from "./_generated/api";
 import { haversineMetres } from "./geoUtils";
 
 export const submitBallot = mutation({
@@ -7,6 +8,7 @@ export const submitBallot = mutation({
     voteId: v.id("votes"),
     fingerprint: v.string(),
     ipAddress: v.string(),
+    contact: v.optional(v.string()), // required when vote is invite-only
     voterLat: v.optional(v.number()),
     voterLng: v.optional(v.number()),
     choices: v.array(
@@ -20,6 +22,23 @@ export const submitBallot = mutation({
     const vote = await ctx.db.get(args.voteId);
     if (!vote) throw new Error("Vote not found");
     if (vote.status !== "active") throw new Error("Vote is not active");
+
+    // Submissions paused due to a recent velocity spike
+    const recentSpike = await ctx.db
+      .query("flaggedActivity")
+      .withIndex("by_vote", (q) => q.eq("voteId", args.voteId))
+      .filter((q) =>
+        q.and(
+          q.eq(q.field("type"), "velocity_spike"),
+          q.gte(q.field("_creationTime"), Date.now() - 3_600_000)
+        )
+      )
+      .first();
+    if (recentSpike) {
+      throw new Error(
+        "Submissions are temporarily paused due to unusual activity. Please try again later."
+      );
+    }
 
     // Server-side geo re-validation — never trust the client result
     if (vote.accessControl.geoEnabled) {
@@ -52,10 +71,26 @@ export const submitBallot = mutation({
       .unique();
     if (existing) throw new Error("Already voted");
 
+    // Invite-only check — server re-validates regardless of client gate
+    if (vote.accessControl.inviteOnly) {
+      if (!args.contact) throw new Error("Contact required for this invite-only vote");
+      const normalised = args.contact.trim().toLowerCase();
+      const entry = await ctx.db
+        .query("inviteList")
+        .withIndex("by_vote_and_contact", (q) =>
+          q.eq("voteId", args.voteId).eq("contact", normalised)
+        )
+        .unique();
+      if (!entry) throw new Error("You are not on the invite list for this vote");
+    }
+
     const submissionId = await ctx.db.insert("submissions", {
       voteId: args.voteId,
       fingerprint: args.fingerprint,
       ipAddress: args.ipAddress,
+      ...(args.contact
+        ? { phoneHash: args.contact.trim().toLowerCase() }
+        : {}),
     });
 
     for (const choice of args.choices) {
@@ -68,6 +103,12 @@ export const submitBallot = mutation({
 
     await ctx.db.patch(args.voteId, {
       submissionCount: vote.submissionCount + 1,
+    });
+
+    // Background anti-abuse checks (non-blocking)
+    await ctx.scheduler.runAfter(0, internal.antiAbuse.runVelocityCheck, {
+      voteId: args.voteId,
+      ipAddress: args.ipAddress,
     });
 
     return submissionId;

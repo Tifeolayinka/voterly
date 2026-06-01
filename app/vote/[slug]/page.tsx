@@ -5,6 +5,7 @@ import { useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { BallotShell } from "@/components/voter/ballot-shell"
 import { GeoGate } from "@/components/voter/geo-gate"
+import { InviteGate } from "@/components/voter/invite-gate"
 import { AlertCircle, CheckCircle2, Clock, Loader2 } from "lucide-react"
 import type { Doc } from "@/convex/_generated/dataModel"
 
@@ -108,7 +109,12 @@ export default function VotePage() {
     return <NotStartedScreen vote={vote} />
   }
 
-  // Geo-restricted votes pass through the gate first
+  // Invite-only: collect and verify contact before showing ballot
+  if (vote.accessControl.inviteOnly) {
+    return <InviteGate vote={vote} positions={positions ?? []} />
+  }
+
+  // Geo-restricted: verify location before showing ballot
   if (vote.accessControl.geoEnabled) {
     return <GeoGate vote={vote} positions={positions ?? []} />
   }

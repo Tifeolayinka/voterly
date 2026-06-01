@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { forwardRef, useImperativeHandle, useState } from "react"
 import { useMutation, useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import type { Id } from "@/convex/_generated/dataModel"
@@ -11,6 +11,11 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
 import { AlertTriangle, Check, Copy, Globe, Loader2, Lock, MapPin } from "lucide-react"
 
+export interface Step4Ref {
+  submit: () => Promise<void>
+  isPublished: () => boolean
+}
+
 interface Props {
   voteId: Id<"votes">
   accessControl: AccessControlData
@@ -19,9 +24,10 @@ interface Props {
   onShowResultsChange: (v: boolean) => void
   onBack: () => void
   onComplete: () => void
+  onPublish?: (slug: string) => void
 }
 
-export function Step4Publish({
+export const Step4Publish = forwardRef<Step4Ref, Props>(function Step4Publish({
   voteId,
   accessControl,
   geoConfig,
@@ -29,7 +35,8 @@ export function Step4Publish({
   onShowResultsChange,
   onBack,
   onComplete,
-}: Props) {
+  onPublish,
+}, ref) {
   const [publishing, setPublishing] = useState(false)
   const [error, setError] = useState("")
   const [publishedSlug, setPublishedSlug] = useState<string | null>(null)
@@ -57,12 +64,18 @@ export function Step4Publish({
         })
       }
       setPublishedSlug(slug)
+      onPublish?.(slug)
     } catch {
       setError("Failed to publish. Please try again.")
     } finally {
       setPublishing(false)
     }
   }
+
+  useImperativeHandle(ref, () => ({
+    submit: handlePublish,
+    isPublished: () => !!publishedSlug,
+  }))
 
   async function handleCopy(url: string) {
     await navigator.clipboard.writeText(url)
@@ -75,33 +88,24 @@ export function Step4Publish({
       typeof window !== "undefined" ? window.location.origin : "https://votely.app"
     const voteUrl = `${origin}/vote/${publishedSlug}`
     return (
-      <Card>
-        <CardContent className="py-10 flex flex-col items-center gap-5 text-center">
-          <div className="h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center">
-            <Check className="h-7 w-7 text-primary" />
-          </div>
-          <div>
-            <h2 className="text-xl font-bold">Vote Published!</h2>
-            <p className="text-muted-foreground text-sm mt-1">
-              Your vote is live and accepting submissions.
-            </p>
-          </div>
-          <div className="w-full max-w-sm rounded-lg bg-muted p-3 text-sm font-mono break-all text-left">
-            {voteUrl}
-          </div>
-          <div className="flex gap-3">
-            <Button variant="outline" onClick={() => handleCopy(voteUrl)}>
-              {copied ? (
-                <Check className="h-4 w-4" />
-              ) : (
-                <Copy className="h-4 w-4" />
-              )}
-              {copied ? "Copied!" : "Copy Link"}
-            </Button>
-            <Button onClick={onComplete}>Go to Dashboard</Button>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="py-8 flex flex-col items-center gap-5 text-center">
+        <div className="size-14 rounded-full bg-primary/10 flex items-center justify-center">
+          <Check className="h-7 w-7 text-primary" />
+        </div>
+        <div>
+          <h2 className="text-[18px] font-bold text-foreground">Vote Published!</h2>
+          <p className="text-muted-foreground text-sm mt-1">
+            Your vote is live and accepting submissions.
+          </p>
+        </div>
+        <div className="w-full rounded-xl bg-muted p-3 text-sm font-mono break-all text-left">
+          {voteUrl}
+        </div>
+        <Button variant="outline" onClick={() => handleCopy(voteUrl)} className="w-full">
+          {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+          {copied ? "Copied!" : "Copy Link"}
+        </Button>
+      </div>
     )
   }
 
@@ -207,19 +211,6 @@ export function Step4Publish({
       </Card>
 
       {error && <p className="text-sm text-destructive">{error}</p>}
-
-      <div className="flex gap-3 pt-2">
-        <Button onClick={handlePublish} disabled={publishing}>
-          {publishing && <Loader2 className="h-4 w-4 animate-spin" />}
-          Publish Vote
-        </Button>
-        <Button variant="ghost" onClick={onBack}>
-          Back
-        </Button>
-        <Button variant="ghost" onClick={onComplete} className="ml-auto">
-          Save as Draft
-        </Button>
-      </div>
     </div>
   )
-}
+})

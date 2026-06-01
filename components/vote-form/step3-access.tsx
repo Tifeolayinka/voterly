@@ -1,5 +1,6 @@
 "use client"
 
+import { forwardRef, useImperativeHandle } from "react"
 import dynamic from "next/dynamic"
 import type { LucideIcon } from "lucide-react"
 import { Clock, Key, MapPin, Phone, Users } from "lucide-react"
@@ -34,6 +35,10 @@ export interface AccessControlData {
   inviteOnly: boolean
 }
 
+export interface Step3Ref {
+  submit: () => void
+}
+
 interface Props {
   value: AccessControlData
   onChange: (v: AccessControlData) => void
@@ -44,7 +49,7 @@ interface Props {
   onSaveDraft: () => void
 }
 
-export function Step3Access({
+export const Step3Access = forwardRef<Step3Ref, Props>(function Step3Access({
   value,
   onChange,
   geoConfig,
@@ -52,10 +57,12 @@ export function Step3Access({
   onBack,
   onContinue,
   onSaveDraft,
-}: Props) {
+}, ref) {
   const update = (patch: Partial<AccessControlData>) =>
     onChange({ ...value, ...patch })
   const isRestricted = value.mode === "restricted"
+
+  useImperativeHandle(ref, () => ({ submit: onContinue }))
 
   return (
     <div className="space-y-4">
@@ -153,18 +160,9 @@ export function Step3Access({
         </CardContent>
       </Card>
 
-      <div className="flex gap-3 pt-2">
-        <Button onClick={onContinue}>Continue</Button>
-        <Button variant="ghost" onClick={onBack}>
-          Back
-        </Button>
-        <Button variant="ghost" onClick={onSaveDraft} className="ml-auto">
-          Save as Draft
-        </Button>
-      </div>
     </div>
   )
-}
+})
 
 function AccessToggle({
   icon: Icon,

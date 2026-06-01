@@ -1,9 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useMutation } from "convex/react"
 import { api } from "@/convex/_generated/api"
-import { ChevronLeft, ChevronRight, Check } from "lucide-react"
+import { ChevronLeft, ChevronRight, Check, Info } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { SingleChoice } from "./single-choice"
 import { MultipleChoice } from "./multiple-choice"
@@ -44,24 +44,15 @@ function isComplete(position: BallotPosition, selections: Selections): boolean {
   return false
 }
 
-function getFingerprint(): string {
-  const key = "votely_fp"
-  let fp = sessionStorage.getItem(key)
-  if (!fp) {
-    fp = crypto.randomUUID()
-    sessionStorage.setItem(key, fp)
-  }
-  return fp
-}
-
 interface Props {
   vote: Doc<"votes">
   positions: BallotPosition[]
   voterLat?: number
   voterLng?: number
+  contact?: string // forwarded from InviteGate for invite-only votes
 }
 
-export function BallotShell({ vote, positions, voterLat, voterLng }: Props) {
+export function BallotShell({ vote, positions, voterLat, voterLng, contact }: Props) {
   const [state, setState] = useState<BallotState>("voting")
   const [currentIdx, setCurrentIdx] = useState(0)
   const [selections, setSelections] = useState<Selections>(() =>
@@ -70,7 +61,39 @@ export function BallotShell({ vote, positions, voterLat, voterLng }: Props) {
   const [submissionId, setSubmissionId] = useState<Id<"submissions"> | null>(null)
   const [errorMsg, setErrorMsg] = useState("")
 
-  const submitBallot = useMutation(api.submissions.submitBallot)
+  // Load FingerprintJS on mount — result is ready long before the voter submits
+  const fpRef = useRef<Promise<string> | null>(null)
+  const ipRef = useRef<string>("unknown")
+
+  useEffect(() => {
+    fpRef.current = import("@fingerprintjs/fingerprintjs")
+      .then((FP) => FP.default.load())
+      .then((fp) => fp.get())
+      .then((result) => result.visitorId)
+
+    fetch("/api/ip")
+      .then((r) => r.json())
+      .then((d: { ip?: string }) => {
+        if (d.ip) ipRef.current = d.ip
+      })
+      .catch(() => {})
+  }, [])
+
+  const submitBallot  = useMutation(api.submissions.submitBallot)
+  const upsertPresence = useMutation(api.presence.upsertPresence)
+
+  // Presence heartbeat — keeps the "X on ballot now" counter live
+  useEffect(() => {
+    let sid = sessionStorage.getItem("votely_session")
+    if (!sid) {
+      sid = crypto.randomUUID()
+      sessionStorage.setItem("votely_session", sid)
+    }
+    const sessionId = sid
+    void upsertPresence({ voteId: vote._id, sessionId })
+    const id = setInterval(() => void upsertPresence({ voteId: vote._id, sessionId }), 20_000)
+    return () => clearInterval(id)
+  }, [vote._id, upsertPresence])
 
   const current = positions[currentIdx]
   const completedCount = positions.filter((p) => isComplete(p, selections)).length
@@ -84,10 +107,12 @@ export function BallotShell({ vote, positions, voterLat, voterLng }: Props) {
     setState("submitting")
     setErrorMsg("")
     try {
+      const fingerprint = await (fpRef.current ?? Promise.resolve(crypto.randomUUID()))
       const id = await submitBallot({
         voteId: vote._id,
-        fingerprint: getFingerprint(),
-        ipAddress: "unknown",
+        fingerprint,
+        ipAddress: ipRef.current,
+        contact,
         voterLat,
         voterLng,
         choices: Object.entries(selections).map(([positionId, candidateIds]) => ({
@@ -230,48 +255,59 @@ export function BallotShell({ vote, positions, voterLat, voterLng }: Props) {
         className="fixed bottom-0 inset-x-0 bg-background/90 backdrop-blur-sm border-t border-border px-4"
         style={{ paddingTop: "12px", paddingBottom: "max(12px, env(safe-area-inset-bottom))" }}
       >
-        <div className="max-w-lg mx-auto flex items-center gap-3">
-          {/* Back */}
-          <button
-            type="button"
-            disabled={currentIdx === 0}
-            onClick={() => setCurrentIdx((i) => i - 1)}
-            aria-label="Previous position"
-            className={cn(
-              "size-12 rounded-xl flex items-center justify-center border border-border bg-background transition-all",
-              "disabled:opacity-30 disabled:pointer-events-none",
-              "hover:bg-muted active:scale-[0.97]"
-            )}
-          >
-            <ChevronLeft className="size-5 text-foreground" />
-          </button>
-
-          {/* Primary CTA */}
-          {currentIdx < positions.length - 1 ? (
+        <div className="max-w-lg mx-auto space-y-2">
+          <div className="flex items-center gap-3">
+            {/* Back */}
             <button
               type="button"
-              onClick={() => setCurrentIdx((i) => i + 1)}
-              className="flex-1 h-12 rounded-xl bg-primary hover:bg-primary/88 active:scale-[0.98] transition-all flex items-center justify-center gap-2 font-semibold text-white text-sm"
-            >
-              Next
-              <ChevronRight className="size-4" />
-            </button>
-          ) : (
-            <button
-              type="button"
-              disabled={!allComplete}
-              onClick={() => setState("confirming")}
+              disabled={currentIdx === 0}
+              onClick={() => setCurrentIdx((i) => i - 1)}
+              aria-label="Previous position"
               className={cn(
-                "flex-1 h-12 rounded-xl transition-all flex items-center justify-center gap-2 font-semibold text-sm",
-                allComplete
-                  ? "bg-primary hover:bg-primary/88 active:scale-[0.98] text-white"
-                  : "bg-muted text-muted-foreground pointer-events-none"
+                "size-12 rounded-xl flex items-center justify-center border border-border bg-background transition-all",
+                "disabled:opacity-30 disabled:pointer-events-none",
+                "hover:bg-muted active:scale-[0.97]"
               )}
             >
-              {allComplete
-                ? "Review & submit"
-                : `${completedCount} of ${positions.length} complete`}
+              <ChevronLeft className="size-5 text-foreground" />
             </button>
+
+            {/* Primary CTA */}
+            {currentIdx < positions.length - 1 ? (
+              <button
+                type="button"
+                onClick={() => setCurrentIdx((i) => i + 1)}
+                className="flex-1 h-12 rounded-xl bg-primary hover:bg-primary/88 active:scale-[0.98] transition-all flex items-center justify-center gap-2 font-semibold text-white text-sm"
+              >
+                Next
+                <ChevronRight className="size-4" />
+              </button>
+            ) : (
+              <button
+                type="button"
+                disabled={!allComplete}
+                onClick={() => setState("confirming")}
+                className={cn(
+                  "flex-1 h-12 rounded-xl transition-all flex items-center justify-center gap-2 font-semibold text-sm",
+                  allComplete
+                    ? "bg-primary hover:bg-primary/88 active:scale-[0.98] text-white"
+                    : "bg-muted text-muted-foreground pointer-events-none"
+                )}
+              >
+                {allComplete
+                  ? "Review & submit"
+                  : `${completedCount} of ${positions.length} complete`}
+              </button>
+            )}
+          </div>
+
+          {/* Fingerprinting disclaimer — shown only on the last step */}
+          {currentIdx === positions.length - 1 && (
+            <p className="flex items-start gap-1.5 text-[10px] text-muted-foreground leading-relaxed">
+              <Info className="size-3 shrink-0 mt-[1px]" />
+              One vote per device is enforced via browser fingerprinting. Fingerprints
+              may not prevent submissions from different devices or browsers.
+            </p>
           )}
         </div>
       </div>

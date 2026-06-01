@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, useState } from "react"
+import { forwardRef, useImperativeHandle, useRef, useState } from "react"
 import { useMutation, useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import type { Doc, Id } from "@/convex/_generated/dataModel"
@@ -702,6 +702,10 @@ function SortablePositionCard({
 
 // ---------- Step2Positions ----------
 
+export interface Step2Ref {
+  submit: () => void
+}
+
 interface Props {
   voteId: Id<"votes">
   onBack: () => void
@@ -709,7 +713,10 @@ interface Props {
   onSaveDraft: () => void
 }
 
-export function Step2Positions({ voteId, onBack, onContinue, onSaveDraft }: Props) {
+export const Step2Positions = forwardRef<Step2Ref, Props>(function Step2Positions(
+  { voteId, onBack, onContinue, onSaveDraft },
+  ref
+) {
   const positions = useQuery(api.positions.getPositionsWithCandidates, { voteId })
   const [showAddPosition, setShowAddPosition] = useState(false)
   const [positionForm, setPositionForm] = useState<PositionForm>(DEFAULT_POSITION_FORM)
@@ -785,6 +792,8 @@ export function Step2Positions({ voteId, onBack, onContinue, onSaveDraft }: Prop
     setContinueError("")
     onContinue()
   }
+
+  useImperativeHandle(ref, () => ({ submit: handleContinue }))
 
   if (positions === undefined) {
     return (
@@ -923,15 +932,6 @@ export function Step2Positions({ voteId, onBack, onContinue, onSaveDraft }: Prop
         <p className="text-sm text-destructive">{continueError}</p>
       )}
 
-      <div className="flex gap-3 pt-2">
-        <Button onClick={handleContinue}>Continue</Button>
-        <Button variant="ghost" onClick={onBack}>
-          Back
-        </Button>
-        <Button variant="ghost" onClick={onSaveDraft} className="ml-auto">
-          Save as Draft
-        </Button>
-      </div>
     </div>
   )
-}
+})

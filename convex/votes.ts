@@ -33,6 +33,7 @@ export const createVote = mutation({
     if (!identity) throw new Error("Unauthenticated");
     return await ctx.db.insert("votes", {
       organiserId: identity.tokenIdentifier,
+      organiserEmail: identity.email ?? undefined,
       title: args.title,
       description: args.description,
       bannerUrl: args.bannerUrl,
@@ -132,6 +133,17 @@ export const deleteVote = mutation({
     if (!vote || vote.organiserId !== identity.tokenIdentifier)
       throw new Error("Not found or unauthorized");
     await ctx.db.delete(args.voteId);
+  },
+});
+
+export const getVoteById = query({
+  args: { voteId: v.id("votes") },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) return null;
+    const vote = await ctx.db.get(args.voteId);
+    if (!vote || vote.organiserId !== identity.tokenIdentifier) return null;
+    return vote;
   },
 });
 

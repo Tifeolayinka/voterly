@@ -8,6 +8,8 @@
  * @module
  */
 
+import type * as analytics from "../analytics.js";
+import type * as antiAbuse from "../antiAbuse.js";
 import type * as candidates from "../candidates.js";
 import type * as files from "../files.js";
 import type * as geo from "../geo.js";
@@ -25,6 +27,8 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  analytics: typeof analytics;
+  antiAbuse: typeof antiAbuse;
   candidates: typeof candidates;
   files: typeof files;
   geo: typeof geo;

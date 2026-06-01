@@ -19,6 +19,7 @@ type GeoStatus =
 interface Props {
   vote: Doc<"votes">
   positions: BallotPosition[]
+  contact?: string // forwarded from InviteGate when both invite-only + geo are enabled
 }
 
 function Screen({
@@ -46,7 +47,7 @@ function Screen({
   )
 }
 
-export function GeoGate({ vote, positions }: Props) {
+export function GeoGate({ vote, positions, contact }: Props) {
   const [status, setStatus] = useState<GeoStatus>("requesting")
   const [slowHint, setSlowHint] = useState(false)
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null)
@@ -261,6 +262,7 @@ export function GeoGate({ vote, positions }: Props) {
       positions={positions}
       voterLat={coords!.lat}
       voterLng={coords!.lng}
+      contact={contact}
     />
   )
 }

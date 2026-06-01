@@ -149,15 +149,15 @@
 **Goal:** Enforce one-vote-per-device and detect suspicious activity server-side.
 
 ### Tasks
-- [ ] Device fingerprinting on the client (FingerprintJS or equivalent) — hash sent with submission
-- [ ] Server-side duplicate check on `(voteId, fingerprint)` before recording a submission
-- [ ] OTP verification flow: voter enters phone number → receives SMS via Twilio (⚠️ not in PRD tech stack — needs adding) → enters code → submission unlocked
-- [ ] Invite-only check: submitted phone/email must appear in `inviteList` for the vote
-- [ ] IP address logged on every submission
-- [ ] Flag logic: same IP submits > 5 votes on one vote → write to `flaggedActivity`
-- [ ] Velocity detection: > 100 submissions in 60 s → pause submissions + send organiser alert email via Resend
-- [ ] Fingerprinting limitation documented in voter-facing UI (tooltip or help text)
+- [x] Device fingerprinting on the client (FingerprintJS or equivalent) — hash sent with submission
+- [x] Server-side duplicate check on `(voteId, fingerprint)` before recording a submission
+- [x] Invite-only check: submitted phone/email must appear in `inviteList` for the vote
+- [x] IP address logged on every submission
+- [x] Flag logic: same IP submits > 5 votes on one vote → write to `flaggedActivity`
+- [x] Velocity detection: > 100 submissions in 60 s → pause submissions + send organiser alert email via Resend
+- [x] Fingerprinting limitation documented in voter-facing UI (tooltip or help text)
 
+**Status:** ✅ Complete  
 **Deliverable:** Duplicate submissions are rejected; velocity spikes trigger alerts; flagged activity is logged.
 
 ---
@@ -166,18 +166,19 @@
 **Goal:** Organisers see live vote counts, leaderboard, and activity; results update without refresh.
 
 ### Tasks
-- [ ] Convex real-time query `getLiveResults` subscribed to on the dashboard — returns results **per position**
-- [ ] Per-vote detail view:
+- [x] Convex real-time query `getLiveResults` subscribed to on the dashboard — returns results **per position**
+- [x] Per-vote detail view:
   - Position tabs or accordion — organiser switches between "Best Dressed Male", "Best Dressed Female", etc.
   - Per position: live vote count per candidate (bar or number), live leaderboard
   - Total submissions counter (a submission covers all positions)
   - Votes-over-time sparkline chart (overall submissions over time)
   - Flagged activity log table
   - Active voter count (voters currently on the ballot page — tracked via Convex presence)
-- [ ] Dashboard overview: votes grouped by Draft / Active / Closed; each row shows title, status badge, vote count, quick actions
-- [ ] Quick actions: close early, reopen, copy link, download QR code (PNG), delete (with confirmation modal)
-- [ ] Optional voter-facing live results on the success screen (toggled per vote in settings)
+- [x] Dashboard overview: votes grouped by Draft / Active / Closed; each row shows title, status badge, vote count, quick actions
+- [x] Quick actions: close early, reopen, copy link, download QR code (PNG), delete (with confirmation modal)
+- [x] Optional voter-facing live results on the success screen (toggled per vote in settings)
 
+**Status:** ✅ Complete  
 **Deliverable:** Dashboard updates live; organiser can manage votes and monitor results in real time.
 
 ---

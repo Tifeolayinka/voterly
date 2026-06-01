@@ -106,6 +106,66 @@ Also set `CLERK_JWT_ISSUER_DOMAIN` to your Clerk instance URL (found in Clerk Da
 
 ---
 
+## Milestone 9: Real-Time Results & Dashboard
+**Date:** 2026-06-01
+**Status:** ✅ Complete
+
+### Files created / modified
+| File | Contents |
+|---|---|
+| `app/(dashboard)/dashboard/votes/[voteId]/page.tsx` | Vote detail page — breadcrumb, title/status, quick actions, stats strip, sparkline, live results with position tabs, flagged activity panel, confirm modal |
+| `convex/votes.ts` | Added `getVoteById` query (auth-gated — returns null if not owner) |
+| `convex/analytics.ts` | `getSubmissionTimestamps` (for sparkline), `getFlaggedActivity` (for flagged panel) — both auth-gated |
+| `components/voter/ballot-shell.tsx` | Added presence heartbeat — `upsertPresence` called on mount and every 20 s |
+
+### Key decisions
+- Vote detail page at `/dashboard/votes/[voteId]` — route matches the card links added in M3
+- Live results powered by existing `getLiveResults` Convex query — auto-re-subscribes via Convex real-time; no polling needed
+- Active voter count via `getActiveCount` with 30 s cutoff; presence heartbeat fires every 20 s in `BallotShell`
+- Sparkline built with native SVG (no charting library) — 40-bucket cumulative line from `getSubmissionTimestamps` timestamps
+- QR code generated client-side via `qrcode` (dynamic import so not bundled on page load) — downloads as PNG at 512×512
+- Confirm modal is a single component driven by `pendingAction` state: handles close, reopen, and delete with different copy and button style (red for delete)
+- Flagged activity section only renders when `flagged.length > 0` — amber-toned card to signal attention needed
+- `getVoteById` and both analytics queries all gate by `organiserId === tokenIdentifier` — organiser can only read their own vote data
+
+---
+
+## Milestone 8: Anti-Abuse & Deduplication
+**Date:** 2026-06-01
+**Status:** ✅ Complete
+
+### Files created / modified
+| File | Contents |
+|---|---|
+| `convex/antiAbuse.ts` | `countSubmissionsByIp` (internal query), `countRecentSubmissions` (internal query), `getOrganiserEmail` (internal query), `flagActivity` (internal mutation), `runVelocityCheck` (internal action — IP threshold + velocity spike checks + Resend alert) |
+| `convex/schema.ts` | Added `organiserEmail` (optional) to `votes`; added `by_vote_and_ip` index to `submissions` |
+| `convex/votes.ts` | `createVote` now stores `identity.email` as `organiserEmail` |
+| `convex/voter.ts` | Added `checkInviteAccess` query — checks contact against `inviteList` (case-insensitive) |
+| `convex/submissions.ts` | Added invite-only server check; velocity-spike pause guard; `contact` arg; schedules `runVelocityCheck` after every submission |
+| `app/api/ip/route.ts` | Next.js Route Handler — returns caller IP from `x-forwarded-for` / `x-real-ip` headers |
+| `components/voter/invite-gate.tsx` | New gate component for invite-only votes — contact form → `checkInviteAccess` query → forwards to GeoGate or BallotShell |
+| `components/voter/ballot-shell.tsx` | Replaced UUID fingerprint with `@fingerprintjs/fingerprintjs` (loaded async on mount); fetches real IP from `/api/ip`; accepts `contact` prop; fingerprinting disclaimer shown on last position step |
+| `components/voter/geo-gate.tsx` | Added optional `contact` prop forwarded to BallotShell (supports invite-only + geo combination) |
+| `app/vote/[slug]/page.tsx` | Added `InviteGate` for invite-only votes (checked before geo gate) |
+
+### Key decisions
+- `@fingerprintjs/fingerprintjs` (open-source free tier) used for device fingerprinting — dynamically imported client-side, loaded on ballot mount so result is ready before the user submits
+- Real IP captured via `/api/ip` route handler reading `x-forwarded-for` / `x-real-ip` headers — gracefully falls back to `"unknown"` if unavailable
+- Velocity spike check in `submitBallot` mutation: if a `velocity_spike` flag exists for this vote within the last hour, the submission is rejected immediately with a user-facing message
+- Anti-abuse checks (IP threshold > 5, velocity > 100/60 s) run in a background action scheduled with `ctx.scheduler.runAfter(0, ...)` — does not add latency to the submission path
+- `RESEND_API_KEY` must be set as a **Convex** environment variable (`npx convex env set RESEND_API_KEY xxx`) — not in `.env.local`; email call uses native `fetch` so no Resend npm package required
+- Invite-only gate: client pre-validates via `checkInviteAccess` query before showing ballot; server always re-validates in `submitBallot` (contact normalised to lowercase on both sides)
+- Invite-only + geo combination supported: `InviteGate` renders `GeoGate` (passing contact) rather than `BallotShell` directly when both flags are enabled
+- `organiserEmail` captured at vote creation time from Clerk identity — needed by velocity alert action without a Clerk API call at alert time
+
+### ⚠️ Manual step required
+Set the Resend API key in Convex:
+```bash
+npx convex env set RESEND_API_KEY re_xxxxxxxxxxxx
+```
+
+---
+
 ## Milestone 2: Convex Schema & Data Layer
 **Date:** 2026-05-30  
 **Status:** ✅ Complete (schema needs `npx convex dev` to deploy to live backend)

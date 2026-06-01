@@ -2,6 +2,20 @@ import { v } from "convex/values";
 import { query } from "./_generated/server";
 import type { Id } from "./_generated/dataModel";
 
+export const checkInviteAccess = query({
+  args: { voteId: v.id("votes"), contact: v.string() },
+  handler: async (ctx, args) => {
+    const normalised = args.contact.trim().toLowerCase();
+    const entry = await ctx.db
+      .query("inviteList")
+      .withIndex("by_vote_and_contact", (q) =>
+        q.eq("voteId", args.voteId).eq("contact", normalised)
+      )
+      .unique();
+    return { allowed: entry !== null };
+  },
+});
+
 // Returns ballot data with all photo storage IDs resolved to serving URLs.
 // Used exclusively by the public voter flow — the organiser form uses
 // getPositionsWithCandidates from positions.ts (raw storage IDs).

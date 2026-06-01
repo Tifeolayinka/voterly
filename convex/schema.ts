@@ -4,6 +4,7 @@ import { v } from "convex/values";
 export default defineSchema({
   votes: defineTable({
     organiserId: v.string(), // Clerk tokenIdentifier
+    organiserEmail: v.optional(v.string()),
     title: v.string(),
     description: v.optional(v.string()),
     bannerUrl: v.optional(v.string()),
@@ -66,7 +67,8 @@ export default defineSchema({
     ipAddress: v.string(),
   })
     .index("by_vote", ["voteId"])
-    .index("by_vote_and_fingerprint", ["voteId", "fingerprint"]),
+    .index("by_vote_and_fingerprint", ["voteId", "fingerprint"])
+    .index("by_vote_and_ip", ["voteId", "ipAddress"]),
 
   submissionChoices: defineTable({
     submissionId: v.id("submissions"),
