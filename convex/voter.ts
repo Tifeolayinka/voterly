@@ -51,15 +51,21 @@ export const getVoteBallot = query({
 
         const resolvedCandidates = await Promise.all(
           sortedCandidates.map(async (c) => {
-            // Collect all storage IDs (primary + extras), deduplicated
-            const storageIds = [
+            // Collect all values (primary + extras), deduplicated
+            const allValues = [
               ...(c.photoUrl ? [c.photoUrl] : []),
               ...(c.photoUrls ?? []),
             ].filter((id, i, arr) => arr.indexOf(id) === i);
 
+            // External URLs (http/https) pass through; everything else is a
+            // Convex storage ID that must be resolved to a signed URL.
             const photoUrls = (
               await Promise.all(
-                storageIds.map((id) => ctx.storage.getUrl(id as Id<"_storage">))
+                allValues.map((val) =>
+                  val.startsWith("http://") || val.startsWith("https://")
+                    ? val
+                    : ctx.storage.getUrl(val as Id<"_storage">)
+                )
               )
             ).filter((url): url is string => url !== null);
 

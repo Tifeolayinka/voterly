@@ -16,6 +16,7 @@ import type * as geo from "../geo.js";
 import type * as geoUtils from "../geoUtils.js";
 import type * as positions from "../positions.js";
 import type * as presence from "../presence.js";
+import type * as seed from "../seed.js";
 import type * as submissions from "../submissions.js";
 import type * as voter from "../voter.js";
 import type * as votes from "../votes.js";
@@ -35,6 +36,7 @@ declare const fullApi: ApiFromModules<{
   geoUtils: typeof geoUtils;
   positions: typeof positions;
   presence: typeof presence;
+  seed: typeof seed;
   submissions: typeof submissions;
   voter: typeof voter;
   votes: typeof votes;
