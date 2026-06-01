@@ -213,15 +213,15 @@
 **Goal:** Every screen meets the mobile-first, under-15-second voting flow bar and is accessible.
 
 ### Tasks
-- [ ] Audit all tap targets — minimum 44×44 px
+- [x] Audit all tap targets — minimum 44×44 px (voter nav buttons h-12/48px, candidate cards min 64px tall, CTA buttons h-12)
 - [ ] Voter flow end-to-end on iOS Safari and Android Chrome
-- [ ] Dark/light mode consistency across all pages
-- [ ] Loading states and skeleton screens for async data
+- [x] Dark/light mode consistency — app is intentionally light-mode only; consistent across all pages
+- [x] Loading states and skeleton screens for async data (dashboard skeleton, Loader2 spinners on vote detail, ballot, present page)
 - [ ] Error boundaries with user-friendly fallback UI
-- [ ] Empty states on dashboard (no votes yet, no candidates yet)
-- [ ] Voter-facing copy review — no jargon, plain direct language
-- [ ] Responsiveness check: dashboard usable on tablet/desktop; voter flow optimised for phone
-- [ ] Accessibility: keyboard navigation, ARIA labels, colour-contrast pass
+- [x] Empty states on dashboard (no votes yet → EmptyState; draft vote detail → "Not published yet" placeholder)
+- [x] Voter-facing copy review — plain language throughout; error screens written as plain sentences not status codes
+- [x] Responsiveness check: dashboard uses responsive grid (sm:grid-cols-2 lg:grid-cols-3); voter flow centred max-w-lg, mobile-first
+- [ ] Accessibility: keyboard navigation, ARIA labels, colour-contrast pass (ARIA labels exist on some voter controls; full audit not done)
 
 **Deliverable:** Full voter flow completes in under 15 seconds on a mid-range phone; no broken states.
 
@@ -234,7 +234,8 @@
 - [ ] Unit tests for Convex functions: geo-check, deduplication, velocity detection
 - [ ] Integration test: full vote creation → publish → vote submission → result update
 - [ ] Manual QA: each voting type (single, multiple, ranked) with geo-restriction enabled and disabled
-- [ ] Verify Resend emails: velocity alert to organiser, OTP delivery to voter
+- [x] Resend velocity-alert email implemented in `antiAbuse.ts` (fires on velocity spike > 100 submissions/60s)
+- [ ] Verify Resend emails end-to-end: confirm delivery and OTP flow
 - [ ] Load test: simulate 100 concurrent submissions on a single vote
 - [ ] Security review: ensure geo-check and dedup are server-side only; no sensitive data exposed to client
 - [ ] Set up production environment variables in Vercel
