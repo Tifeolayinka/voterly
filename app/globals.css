@@ -134,3 +134,56 @@
 .animate-ring-pulse {
   animation: ring-pulse 2s ease-out infinite;
 }
+
+/* ─── Landing page float animations ──────────────────────────────────────── */
+@keyframes lp-float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-10px); }
+}
+
+.lp-float-1 { animation: lp-float 4s   ease-in-out infinite; }
+.lp-float-2 { animation: lp-float 4.8s ease-in-out infinite 0.8s; }
+.lp-float-3 { animation: lp-float 3.9s ease-in-out infinite 0.4s; }
+.lp-float-4 { animation: lp-float 5.2s ease-in-out infinite 1.2s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .lp-float-1, .lp-float-2, .lp-float-3, .lp-float-4 { animation: none; }
+}
+
+/* ─── Scroll-reveal ───────────────────────────────────────────────────────── */
+.lp-reveal {
+  opacity: 1;
+  transform: none;
+}
+.lp-reveal-init {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.lp-reveal-init.lp-visible {
+  opacity: 1;
+  transform: none;
+}
+.lp-reveal-init.lp-delay-1 { transition-delay: 0.1s; }
+.lp-reveal-init.lp-delay-2 { transition-delay: 0.2s; }
+.lp-reveal-init.lp-delay-3 { transition-delay: 0.3s; }
+.lp-reveal-init.lp-delay-4 { transition-delay: 0.4s; }
+.lp-reveal-init.lp-delay-5 { transition-delay: 0.5s; }
+.lp-reveal-init.lp-delay-6 { transition-delay: 0.6s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .lp-reveal-init { opacity: 1; transform: none; transition: none; }
+}
+
+/* ─── Hero cycling word ───────────────────────────────────────────────────── */
+@keyframes hero-word-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.hero-word-enter {
+  display: inline-block;
+  animation: hero-word-in 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-word-enter { animation: none; }
+}
