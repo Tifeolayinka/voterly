@@ -94,7 +94,7 @@ function Sparkline({ timestamps }: { timestamps: number[] }) {
 // ─── Position result bars ────────────────────────────────────────────────────
 
 function PositionResultBars({ result }: { result: PositionResult }) {
-  const { candidates } = result
+  const candidates = [...result.candidates].sort((a, b) => b.votes - a.votes)
   const total = candidates.reduce((s, c) => s + c.votes, 0)
   const maxVotes = Math.max(...candidates.map((c) => c.votes), 1)
 
@@ -226,7 +226,6 @@ export default function VoteDetailPage() {
   const deleteVote = useMutation(api.votes.deleteVote)
   const { openDrawer } = useVoteDrawer()
 
-  const [selectedTab,   setSelectedTab]   = useState(0)
   const [pendingAction, setPendingAction] = useState<PendingAction | null>(null)
   const [isActing,      setIsActing]      = useState(false)
   const [copied,        setCopied]        = useState(false)
@@ -288,10 +287,9 @@ export default function VoteDetailPage() {
     )
   }
 
-  const cfg            = STATUS_CONFIG[vote.status]
-  const isActive       = vote.status === "active"
-  const isDraft        = vote.status === "draft"
-  const selectedResult = results?.[selectedTab]
+  const cfg      = STATUS_CONFIG[vote.status]
+  const isActive = vote.status === "active"
+  const isDraft  = vote.status === "draft"
 
   return (
     <div className="p-6 md:p-8 space-y-6">
@@ -477,38 +475,31 @@ export default function VoteDetailPage() {
               <p className="text-sm text-muted-foreground">No positions found for this vote.</p>
             </div>
           ) : (
-            <>
-              {/* Position tabs — only when there are multiple positions */}
-              {results.length > 1 && (
-                <div className="flex overflow-x-auto border-b border-border">
-                  {results.map((r, i) => (
-                    <button
-                      key={r.position._id}
-                      type="button"
-                      onClick={() => setSelectedTab(i)}
-                      className={cn(
-                        "px-4 py-2.5 text-[12.5px] font-medium whitespace-nowrap shrink-0 border-b-2 -mb-px transition-colors",
-                        i === selectedTab
-                          ? "border-primary text-primary"
-                          : "border-transparent text-muted-foreground hover:text-foreground"
-                      )}
-                    >
+            <div className={cn(
+              "p-4 grid gap-4",
+              results.length === 1
+                ? "grid-cols-1"
+                : results.length <= 4
+                  ? "grid-cols-1 lg:grid-cols-2"
+                  : "grid-cols-1 md:grid-cols-2 xl:grid-cols-3"
+            )}>
+              {results.map((r) => (
+                <div
+                  key={r.position._id}
+                  className="rounded-xl border border-border bg-background p-4 space-y-3"
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
                       {r.position.title}
-                    </button>
-                  ))}
+                    </p>
+                    <p className="text-[11px] text-muted-foreground/60 tabular-nums shrink-0">
+                      {r.candidates.reduce((s, c) => s + c.votes, 0)} votes
+                    </p>
+                  </div>
+                  <PositionResultBars result={r} />
                 </div>
-              )}
-
-              {/* Candidate bars */}
-              <div className="p-4">
-                {results.length === 1 && (
-                  <p className="text-[11px] font-semibold text-muted-foreground mb-3 uppercase tracking-wide">
-                    {results[0].position.title}
-                  </p>
-                )}
-                {selectedResult && <PositionResultBars result={selectedResult} />}
-              </div>
-            </>
+              ))}
+            </div>
           )}
         </div>
       ) : (
