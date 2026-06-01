@@ -2,6 +2,19 @@ import { v } from "convex/values";
 import { query } from "./_generated/server";
 import type { Id } from "./_generated/dataModel";
 
+export const checkHasVoted = query({
+  args: { voteId: v.id("votes"), fingerprint: v.string() },
+  handler: async (ctx, args) => {
+    const existing = await ctx.db
+      .query("submissions")
+      .withIndex("by_vote_and_fingerprint", (q) =>
+        q.eq("voteId", args.voteId).eq("fingerprint", args.fingerprint)
+      )
+      .unique();
+    return existing !== null;
+  },
+});
+
 export const checkInviteAccess = query({
   args: { voteId: v.id("votes"), contact: v.string() },
   handler: async (ctx, args) => {

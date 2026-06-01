@@ -26,6 +26,7 @@ export default defineSchema({
       otpRequired: v.boolean(),
       inviteOnly: v.boolean(),
     }),
+    closeScheduleId: v.optional(v.id("_scheduled_functions")),
   })
     .index("by_organiser", ["organiserId"])
     .index("by_slug", ["slug"])

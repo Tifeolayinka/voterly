@@ -1,4 +1,4 @@
-import { v } from "convex/values";
+import { v, ConvexError } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { internal } from "./_generated/api";
 import { haversineMetres } from "./geoUtils";
@@ -21,7 +21,7 @@ export const submitBallot = mutation({
   handler: async (ctx, args) => {
     const vote = await ctx.db.get(args.voteId);
     if (!vote) throw new Error("Vote not found");
-    if (vote.status !== "active") throw new Error("Vote is not active");
+    if (vote.status !== "active") throw new ConvexError("This vote is no longer accepting ballots.");
 
     // Submissions paused due to a recent velocity spike
     const recentSpike = await ctx.db
@@ -35,7 +35,7 @@ export const submitBallot = mutation({
       )
       .first();
     if (recentSpike) {
-      throw new Error(
+      throw new ConvexError(
         "Submissions are temporarily paused due to unusual activity. Please try again later."
       );
     }
@@ -43,7 +43,7 @@ export const submitBallot = mutation({
     // Server-side geo re-validation — never trust the client result
     if (vote.accessControl.geoEnabled) {
       if (args.voterLat == null || args.voterLng == null) {
-        throw new Error("Location required for this vote");
+        throw new ConvexError("Location required for this vote");
       }
       const geoConfig = await ctx.db
         .query("geoConfig")
@@ -57,7 +57,7 @@ export const submitBallot = mutation({
           geoConfig.lng
         );
         if (dist > geoConfig.radiusMetres) {
-          throw new Error("Outside geo-fence");
+          throw new ConvexError("Outside geo-fence");
         }
       }
     }
@@ -69,7 +69,7 @@ export const submitBallot = mutation({
         q.eq("voteId", args.voteId).eq("fingerprint", args.fingerprint)
       )
       .unique();
-    if (existing) throw new Error("Already voted");
+    if (existing) throw new ConvexError("Already voted");
 
     // Invite-only check — server re-validates regardless of client gate
     if (vote.accessControl.inviteOnly) {
@@ -81,7 +81,7 @@ export const submitBallot = mutation({
           q.eq("voteId", args.voteId).eq("contact", normalised)
         )
         .unique();
-      if (!entry) throw new Error("You are not on the invite list for this vote");
+      if (!entry) throw new ConvexError("You are not on the invite list for this vote");
     }
 
     const submissionId = await ctx.db.insert("submissions", {

@@ -1,5 +1,6 @@
 import { v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import { mutation, query, internalMutation } from "./_generated/server";
+import { internal } from "./_generated/api";
 
 function generateSlug(title: string): string {
   const base = title
@@ -74,6 +75,27 @@ export const updateVote = mutation({
       throw new Error("Not found or unauthorized");
     const { voteId, ...patch } = args;
     await ctx.db.patch(voteId, patch);
+    // Reschedule auto-close if endAt changed on an active vote
+    if (args.endAt !== undefined && vote.status === "active") {
+      if (vote.closeScheduleId) {
+        try { await ctx.scheduler.cancel(vote.closeScheduleId); } catch {}
+      }
+      if (args.endAt) {
+        const sid = await ctx.scheduler.runAt(args.endAt, internal.votes.autoClose, { voteId });
+        await ctx.db.patch(voteId, { closeScheduleId: sid });
+      } else {
+        await ctx.db.patch(voteId, { closeScheduleId: undefined });
+      }
+    }
+  },
+});
+
+export const autoClose = internalMutation({
+  args: { voteId: v.id("votes") },
+  handler: async (ctx, args) => {
+    const vote = await ctx.db.get(args.voteId);
+    if (!vote || vote.status !== "active") return;
+    await ctx.db.patch(args.voteId, { status: "closed", closeScheduleId: undefined });
   },
 });
 
@@ -96,6 +118,18 @@ export const publishVote = mutation({
       showResultsToVoters: args.showResultsToVoters,
       accessControl: args.accessControl,
     });
+    // Schedule auto-close if endAt is set
+    if (vote.endAt) {
+      if (vote.closeScheduleId) {
+        try { await ctx.scheduler.cancel(vote.closeScheduleId); } catch {}
+      }
+      const sid = await ctx.scheduler.runAt(
+        vote.endAt,
+        internal.votes.autoClose,
+        { voteId: args.voteId }
+      );
+      await ctx.db.patch(args.voteId, { closeScheduleId: sid });
+    }
     return slug;
   },
 });

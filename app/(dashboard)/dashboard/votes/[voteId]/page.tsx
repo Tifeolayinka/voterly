@@ -17,6 +17,7 @@ import {
   Loader2,
   BarChart3,
   Pencil,
+  Maximize2,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { Id, Doc } from "@/convex/_generated/dataModel"
@@ -366,6 +367,16 @@ export default function VoteDetailPage() {
                 <QrCode className="size-3.5" />
                 QR code
               </button>
+
+              {!isDraft && (
+                <Link
+                  href={`/present/${vote._id}`}
+                  className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg border border-primary/30 bg-primary/5 hover:bg-primary/10 text-[12.5px] font-medium text-primary transition-all"
+                >
+                  <Maximize2 className="size-3.5" />
+                  Present
+                </Link>
+              )}
             </>
           )}
 
@@ -508,12 +519,13 @@ export default function VoteDetailPage() {
           <p className="text-[13px] text-muted-foreground max-w-xs leading-relaxed">
             Results appear here once you publish the vote and voters start submitting ballots.
           </p>
-          <Link
-            href="/dashboard/create"
+          <button
+            type="button"
+            onClick={() => openDrawer(vote._id)}
             className="mt-1 h-9 px-4 rounded-xl bg-primary text-white text-[13px] font-semibold hover:bg-primary/90 transition-all inline-flex items-center"
           >
             Continue setup
-          </Link>
+          </button>
         </div>
       )}
 

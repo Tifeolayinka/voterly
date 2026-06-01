@@ -1,9 +1,9 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { useMutation } from "convex/react"
+import { useMutation, useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
-import { ChevronLeft, ChevronRight, Check, Info } from "lucide-react"
+import { ChevronLeft, ChevronRight, Check, Info, Loader2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { SingleChoice } from "./single-choice"
 import { MultipleChoice } from "./multiple-choice"
@@ -61,26 +61,34 @@ export function BallotShell({ vote, positions, voterLat, voterLng, contact }: Pr
   const [submissionId, setSubmissionId] = useState<Id<"submissions"> | null>(null)
   const [errorMsg, setErrorMsg] = useState("")
 
-  // Load FingerprintJS on mount — result is ready long before the voter submits
-  const fpRef = useRef<Promise<string> | null>(null)
+  const [fingerprint, setFingerprint] = useState<string | null>(null)
   const ipRef = useRef<string>("unknown")
 
   useEffect(() => {
-    fpRef.current = import("@fingerprintjs/fingerprintjs")
+    import("@fingerprintjs/fingerprintjs")
       .then((FP) => FP.default.load())
       .then((fp) => fp.get())
-      .then((result) => result.visitorId)
+      .then((result) => setFingerprint(result.visitorId))
+      .catch(() => setFingerprint(crypto.randomUUID()))
 
     fetch("/api/ip")
       .then((r) => r.json())
-      .then((d: { ip?: string }) => {
-        if (d.ip) ipRef.current = d.ip
-      })
+      .then((d: { ip?: string }) => { if (d.ip) ipRef.current = d.ip })
       .catch(() => {})
   }, [])
 
-  const submitBallot  = useMutation(api.submissions.submitBallot)
+  const submitBallot   = useMutation(api.submissions.submitBallot)
   const upsertPresence = useMutation(api.presence.upsertPresence)
+
+  const hasVoted = useQuery(
+    api.voter.checkHasVoted,
+    fingerprint ? { voteId: vote._id, fingerprint } : "skip"
+  )
+
+  // As soon as the server confirms this fingerprint already voted, surface it
+  useEffect(() => {
+    if (hasVoted === true) setState("already_voted")
+  }, [hasVoted])
 
   // Presence heartbeat — keeps the "X on ballot now" counter live
   useEffect(() => {
@@ -107,10 +115,10 @@ export function BallotShell({ vote, positions, voterLat, voterLng, contact }: Pr
     setState("submitting")
     setErrorMsg("")
     try {
-      const fingerprint = await (fpRef.current ?? Promise.resolve(crypto.randomUUID()))
+      const fp = fingerprint ?? crypto.randomUUID()
       const id = await submitBallot({
         voteId: vote._id,
-        fingerprint,
+        fingerprint: fp,
         ipAddress: ipRef.current,
         contact,
         voterLat,
@@ -123,7 +131,13 @@ export function BallotShell({ vote, positions, voterLat, voterLng, contact }: Pr
       setSubmissionId(id)
       setState("success")
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Submission failed. Please try again."
+      // ConvexError.data carries the user-facing message; fall back to err.message
+      const msg: string =
+        typeof (err as { data?: unknown })?.data === "string"
+          ? (err as { data: string }).data
+          : err instanceof Error
+            ? err.message
+            : "Submission failed. Please try again."
       if (msg.toLowerCase().includes("already voted")) {
         setState("already_voted")
       } else {
@@ -131,6 +145,15 @@ export function BallotShell({ vote, positions, voterLat, voterLng, contact }: Pr
         setState("confirming")
       }
     }
+  }
+
+  // Block ballot render until we know for certain this device hasn't already voted
+  if (fingerprint === null || hasVoted === undefined) {
+    return (
+      <div className="min-h-dvh flex items-center justify-center">
+        <Loader2 className="size-5 animate-spin text-muted-foreground" />
+      </div>
+    )
   }
 
   if (state === "success") {
