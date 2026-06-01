@@ -189,13 +189,22 @@
 > Note: slug generation happens at publish time (M4 Step 5). This milestone covers the sharing UI built on top of that slug.
 
 ### Tasks
-- [ ] Public URL: `/vote/[slug]`
-- [ ] QR code generated client-side using `qrcode` library, exported as PNG
-- [ ] QR code sized for projection/print (min 512×512 px with quiet zone)
-- [ ] One-tap copy for share link
+- [x] Public URL: `/vote/[slug]`
+- [x] QR code generated client-side using `qrcode` library, exported as PNG
+- [x] QR code sized for projection/print (min 512×512 px with quiet zone)
+- [x] One-tap copy for share link
 - [ ] WhatsApp-ready message template: "Vote title + link" — copy with one tap
-- [ ] Download QR code button in dashboard quick actions
+- [x] Download QR code button in dashboard quick actions
 
+### Beyond plan (also shipped in M10)
+- [x] `/present/[voteId]` fullscreen projection page — giant QR + live ballot count + vote URL; toggles to live results bar chart (Space bar or button); auth-guarded
+- [x] "Present" button on vote detail page
+- [x] Auto-close on endAt — Convex scheduler fires `autoClose` mutation at configured end time; reschedules if endAt is edited on an active vote
+- [x] Fix: `ConvexError` used for all user-facing mutation errors so messages reach the client
+- [x] Fix: `checkHasVoted` query + fingerprint-gated render — voters who already voted never see candidates again
+- [x] Fix: "Continue setup" on draft votes now opens the edit drawer
+
+**Status:** ✅ Complete (WhatsApp template deferred)  
 **Deliverable:** Organiser can share a link or QR code immediately after publishing.
 
 ---
