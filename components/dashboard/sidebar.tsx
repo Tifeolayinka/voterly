@@ -41,6 +41,7 @@ export function DashboardSidebar() {
 
           <Link
             href="/dashboard"
+            aria-current={isOnDashboard ? "page" : undefined}
             className={cn(
               'flex items-center justify-between px-3 py-2 rounded-lg text-[13.5px] font-medium transition-colors',
               isOnDashboard
@@ -49,7 +50,7 @@ export function DashboardSidebar() {
             )}
           >
             <span className="flex items-center gap-2.5">
-              <LayoutDashboard className="h-[15px] w-[15px] shrink-0" />
+              <LayoutDashboard aria-hidden="true" className="h-[15px] w-[15px] shrink-0" />
               My Votes
             </span>
             {votes !== undefined && (
@@ -71,7 +72,7 @@ export function DashboardSidebar() {
                 className="flex items-center justify-between px-3 py-[5px] rounded-md"
               >
                 <span className="flex items-center gap-2">
-                  <span className={cn('size-[6px] rounded-full shrink-0', dot)} />
+                  <span aria-hidden="true" className={cn('size-[6px] rounded-full shrink-0', dot)} />
                   <span className="text-[12.5px] text-slate-500">{label}</span>
                 </span>
                 <span className={cn(

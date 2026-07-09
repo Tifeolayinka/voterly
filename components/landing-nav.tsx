@@ -8,8 +8,8 @@ import { cn } from "@/lib/utils"
 
 const NAV_LINKS = [
   { label: "Features",     href: "#features" },
-  { label: "How it works", href: "#how-it-works" },
-  { label: "Pricing",      href: "#pricing" },
+  { label: "How it works", href: "#features" },
+  { label: "Who it's for", href: "#audience" },
 ]
 
 export function LandingNav() {
@@ -24,10 +24,10 @@ export function LandingNav() {
   }, [])
 
   const transparent = !scrolled && !menuOpen
-  const textCls     = "text-white/70 hover:text-white"
+  const textCls     = "text-silver-pine hover:text-obsidian"
   const bgCls       = transparent
     ? "bg-transparent"
-    : "bg-[oklch(0.10_0.022_255)]/90 backdrop-blur-md border-b border-white/[0.07]"
+    : "bg-canvas-white/90 backdrop-blur-md border-b border-black/[0.04] shadow-sm"
 
   return (
     <header
@@ -39,10 +39,10 @@ export function LandingNav() {
       <div className="max-w-7xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between gap-6">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2.5 shrink-0">
-          <div className="size-8 rounded-lg bg-primary flex items-center justify-center">
+          <div className="size-8 rounded-[16px] bg-electric-blue flex items-center justify-center">
             <CheckCircle2 className="h-[18px] w-[18px] text-white" />
           </div>
-          <span className="font-bold text-[16px] tracking-tight text-white">
+          <span className="font-bold text-[16px] tracking-tight text-obsidian">
             Votely
           </span>
         </Link>
@@ -54,10 +54,11 @@ export function LandingNav() {
               key={label}
               href={href}
               className={cn(
-                "px-3.5 py-2 rounded-lg text-sm font-medium transition-colors duration-200",
+                "px-3.5 py-2 rounded-lg text-[14px] font-medium tracking-tight transition-colors duration-200",
                 textCls,
-                transparent ? "hover:bg-white/10" : "hover:bg-slate-50",
+                transparent ? "hover:bg-black/5" : "hover:bg-arctic-mist",
               )}
+              style={{ letterSpacing: "-0.01em" }}
             >
               {label}
             </a>
@@ -67,17 +68,17 @@ export function LandingNav() {
         {/* Desktop auth */}
         <div className="hidden md:flex items-center gap-2 shrink-0">
           {!isLoaded ? (
-            <div className="h-9 w-28 rounded-lg bg-white/10 animate-pulse" />
+            <div className="h-9 w-28 rounded-full bg-black/5 animate-pulse" />
           ) : isSignedIn ? (
-            <Link href="/dashboard" className="h-9 px-4 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary/88 transition-colors">
+            <Link href="/dashboard" className="h-9 px-5 rounded-[36px] bg-midnight-ink text-canvas-white text-[14px] font-medium hover:bg-obsidian transition-colors flex items-center justify-center">
               Dashboard
             </Link>
           ) : (
             <>
-              <Link href="/sign-in" className="h-9 px-4 rounded-lg text-sm font-medium text-white/70 hover:text-white hover:bg-white/8 transition-colors">
+              <Link href="/sign-in" className="h-9 px-4 rounded-lg text-[14px] font-medium text-silver-pine hover:text-obsidian hover:bg-black/5 transition-colors flex items-center justify-center">
                 Log in
               </Link>
-              <Link href="/sign-up" className="h-9 px-5 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary/88 transition-colors">
+              <Link href="/sign-up" className="h-9 px-6 rounded-[36px] bg-midnight-ink text-canvas-white text-[14px] font-medium hover:bg-obsidian transition-colors flex items-center justify-center">
                 Start free
               </Link>
             </>
@@ -90,10 +91,7 @@ export function LandingNav() {
           onClick={() => setMenuOpen((o) => !o)}
           aria-label={menuOpen ? "Close menu" : "Open menu"}
           className={cn(
-            "md:hidden p-2 rounded-lg transition-colors",
-            transparent
-              ? "text-white hover:bg-white/10"
-              : "text-slate-700 hover:bg-slate-100",
+            "md:hidden p-2 rounded-lg transition-colors text-silver-pine hover:bg-black/5"
           )}
         >
           {menuOpen ? <X className="size-5" /> : <Menu className="size-5" />}
@@ -102,13 +100,13 @@ export function LandingNav() {
 
       {/* Mobile drawer */}
       {menuOpen && (
-        <div className="md:hidden border-t border-slate-100 bg-white px-5 pt-3 pb-5 space-y-1">
+        <div className="md:hidden border-t border-black/[0.04] bg-canvas-white px-5 pt-3 pb-5 space-y-1 shadow-lg">
           {NAV_LINKS.map(({ label, href }) => (
             <a
               key={label}
               href={href}
               onClick={() => setMenuOpen(false)}
-              className="block px-3 py-2.5 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50"
+              className="block px-3 py-2.5 rounded-lg text-sm font-medium text-obsidian hover:bg-arctic-mist"
             >
               {label}
             </a>
@@ -117,7 +115,7 @@ export function LandingNav() {
             {isSignedIn ? (
               <Link
                 href="/dashboard"
-                className="h-11 flex items-center justify-center rounded-xl bg-primary text-white text-sm font-semibold"
+                className="h-11 flex items-center justify-center rounded-[32px] bg-midnight-ink text-canvas-white text-sm font-semibold"
               >
                 Dashboard
               </Link>
@@ -125,13 +123,13 @@ export function LandingNav() {
               <>
                 <Link
                   href="/sign-in"
-                  className="h-11 flex items-center justify-center rounded-xl border border-slate-200 text-sm font-medium text-slate-700"
+                  className="h-11 flex items-center justify-center rounded-[32px] border border-black/10 text-sm font-medium text-obsidian"
                 >
                   Log in
                 </Link>
                 <Link
                   href="/sign-up"
-                  className="h-11 flex items-center justify-center rounded-xl bg-primary text-white text-sm font-semibold"
+                  className="h-11 flex items-center justify-center rounded-[32px] bg-midnight-ink text-canvas-white text-sm font-semibold"
                 >
                   Start voting free
                 </Link>
@@ -151,8 +149,8 @@ export function LandingHeroActions() {
   if (!isLoaded) {
     return (
       <div className="flex gap-3 flex-wrap justify-center">
-        <div className="h-12 w-48 rounded-xl bg-white/20 animate-pulse" />
-        <div className="h-12 w-36 rounded-xl bg-white/10 animate-pulse" />
+        <div className="h-12 w-48 rounded-[32px] bg-black/10 animate-pulse" />
+        <div className="h-12 w-36 rounded-[32px] bg-black/5 animate-pulse" />
       </div>
     )
   }
@@ -162,7 +160,7 @@ export function LandingHeroActions() {
       <div className="flex justify-center">
         <Link
           href="/dashboard"
-          className="inline-flex items-center h-12 px-8 rounded-xl bg-white text-slate-900 text-sm font-bold hover:bg-white/90 transition-colors"
+          className="inline-flex items-center h-[48px] px-8 rounded-[32px] bg-midnight-ink text-canvas-white text-sm font-bold hover:bg-obsidian transition-colors shadow-subtle"
         >
           Go to Dashboard →
         </Link>
@@ -174,13 +172,13 @@ export function LandingHeroActions() {
     <div className="flex gap-3 flex-wrap justify-center">
       <Link
         href="/sign-up"
-        className="inline-flex items-center h-12 px-8 rounded-xl bg-white text-slate-900 text-sm font-bold hover:bg-white/90 transition-colors"
+        className="inline-flex items-center h-[48px] px-8 rounded-[32px] bg-midnight-ink text-canvas-white text-sm font-bold hover:bg-obsidian transition-colors shadow-subtle"
       >
         Start Voting Free
       </Link>
       <a
         href="#how-it-works"
-        className="inline-flex items-center h-12 px-6 rounded-xl border border-white/30 text-white text-sm font-semibold hover:bg-white/10 transition-colors"
+        className="inline-flex items-center h-[48px] px-6 rounded-[32px] border-2 border-silver-pine/20 text-obsidian text-sm font-semibold hover:bg-black/5 transition-colors"
       >
         See how it works
       </a>

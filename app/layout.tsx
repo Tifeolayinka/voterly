@@ -1,8 +1,20 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Geist, Montserrat, Inter } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Providers } from "@/components/providers";
 import "./globals.css";
+
+const geist = Geist({
+  subsets: ["latin"],
+  variable: "--font-geist",
+  display: "swap",
+});
+
+const montserrat = Montserrat({
+  subsets: ["latin"],
+  variable: "--font-aeonik",
+  display: "swap",
+});
 
 const inter = Inter({
   subsets: ["latin"],
@@ -25,12 +37,13 @@ export default function RootLayout({
       <html
         lang="en"
         suppressHydrationWarning
-        className={`${inter.variable} h-full antialiased`}
+        className={`${geist.variable} ${montserrat.variable} ${inter.variable} h-full antialiased`}
       >
-        <body className="min-h-full flex flex-col">
+        <body className="min-h-full flex flex-col font-sans">
           <Providers>{children}</Providers>
         </body>
       </html>
     </ClerkProvider>
   );
 }
+

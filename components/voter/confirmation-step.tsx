@@ -36,8 +36,8 @@ export function ConfirmationStep({
       {/* Scroll area */}
       <div className="flex-1 px-4 py-6 pb-28 max-w-lg mx-auto w-full space-y-4">
         {errorMsg && (
-          <div className="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-            <AlertCircle className="size-4 mt-0.5 shrink-0 text-red-500" />
+          <div role="alert" className="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            <AlertCircle aria-hidden="true" className="size-4 mt-0.5 shrink-0 text-red-500" />
             <span>{errorMsg}</span>
           </div>
         )}
@@ -126,11 +126,12 @@ export function ConfirmationStep({
             type="button"
             onClick={onConfirm}
             disabled={isSubmitting}
+            aria-busy={isSubmitting}
             className="flex-1 h-12 rounded-xl bg-primary hover:bg-primary/88 active:scale-[0.98] transition-all flex items-center justify-center gap-2 font-semibold text-white text-sm disabled:opacity-60 disabled:pointer-events-none"
           >
             {isSubmitting ? (
               <>
-                <Loader2 className="size-4 animate-spin" />
+                <Loader2 aria-hidden="true" className="size-4 animate-spin" />
                 Submitting…
               </>
             ) : (

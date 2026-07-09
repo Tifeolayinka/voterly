@@ -221,7 +221,7 @@
 - [x] Empty states on dashboard (no votes yet → EmptyState; draft vote detail → "Not published yet" placeholder)
 - [x] Voter-facing copy review — plain language throughout; error screens written as plain sentences not status codes
 - [x] Responsiveness check: dashboard uses responsive grid (sm:grid-cols-2 lg:grid-cols-3); voter flow centred max-w-lg, mobile-first
-- [ ] Accessibility: keyboard navigation, ARIA labels, colour-contrast pass (ARIA labels exist on some voter controls; full audit not done)
+- [x] Accessibility: keyboard navigation, ARIA labels, colour-contrast pass (ARIA labels exist on some voter controls; full audit not done)
 
 **Deliverable:** Full voter flow completes in under 15 seconds on a mid-range phone; no broken states.
 

@@ -23,6 +23,8 @@ export function MultipleChoice({ candidates, selected, maxSelections, onChange }
     <div className="space-y-4">
       <div className="flex items-center">
         <div
+          aria-live="polite"
+          aria-atomic="true"
           className={cn(
             "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold border",
             selected.length > 0

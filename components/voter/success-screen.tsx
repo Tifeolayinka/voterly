@@ -24,7 +24,7 @@ export function SuccessScreen({ vote, submissionId: _ }: Props) {
           <div className="absolute inset-0 rounded-full animate-ring-pulse" />
           <div className="size-24 rounded-full ring-1 ring-primary/20 flex items-center justify-center">
             <div className="size-20 rounded-full bg-primary/8 flex items-center justify-center">
-              <CheckCircle2 className="size-10 text-primary" strokeWidth={1.5} />
+              <CheckCircle2 aria-hidden="true" className="size-10 text-primary" strokeWidth={1.5} />
             </div>
           </div>
         </div>
@@ -48,8 +48,9 @@ export function SuccessScreen({ vote, submissionId: _ }: Props) {
           </div>
 
           {liveResults === undefined ? (
-            <div className="flex justify-center py-10">
-              <Loader2 className="size-5 animate-spin text-muted-foreground" />
+            <div role="status" className="flex justify-center py-10">
+              <Loader2 aria-hidden="true" className="size-5 animate-spin text-muted-foreground" />
+              <span className="sr-only">Loading live results…</span>
             </div>
           ) : (
             liveResults.map(({ position, candidates }) => {
@@ -87,6 +88,11 @@ export function SuccessScreen({ vote, submissionId: _ }: Props) {
                           </div>
                           <div className="h-[3px] rounded-full bg-slate-100 overflow-hidden">
                             <div
+                              role="progressbar"
+                              aria-valuenow={pct}
+                              aria-valuemin={0}
+                              aria-valuemax={100}
+                              aria-label={`${c.name}: ${pct}%`}
                               className="h-full rounded-full transition-all duration-700 ease-out"
                               style={{
                                 width: `${pct}%`,

@@ -1,63 +1,52 @@
 import Image from "next/image"
 import { LandingNav, LandingHeroActions } from "@/components/landing-nav"
 import { HeroCyclingWord } from "@/components/hero-cycling-word"
+import {
+  IntroSection,
+  FeaturesSection,
+  UseCasesSection,
+  TestimonialSection,
+  FinalCtaSection,
+  LandingFooter,
+} from "@/components/landing-sections"
 
 function HeroSection() {
   return (
-    <section className="relative h-[100vh] overflow-hidden flex flex-col">
+    <section className="relative h-[100vh] overflow-hidden flex flex-col bg-sky-wash">
+      {/* Soft decorative background gradients matching the light Geniestudio theme */}
+      <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-whisper-fade-blue blur-[100px] opacity-70 pointer-events-none" />
+      <div className="absolute top-[20%] right-[-10%] w-[40%] h-[60%] rounded-full bg-whisper-fade-violet blur-[120px] opacity-60 pointer-events-none" />
+      <div className="absolute bottom-[-10%] left-[20%] w-[60%] h-[40%] rounded-full bg-whisper-fade-yellow blur-[100px] opacity-50 pointer-events-none" />
 
-      {/* Background photo */}
-      <Image
-        src="/hero-community.png"
-        alt="Community members gathered outdoors for a vote, with a large cross on a hill and a blue sky behind"
-        fill
-        priority
-        className="object-cover object-center"
-        sizes="100vw"
-      />
+      <div className="relative z-10 w-full flex flex-col items-center px-5 sm:px-8 pt-[7.5rem] pb-0 text-center flex-1 justify-center">
 
-      {/* Radial overlay anchored to the top — darkens the nav/sky area, fades out below */}
-      <div
-        className="absolute inset-0"
-        style={{
-          background: "radial-gradient(ellipse 120% 60% at 50% 0%, oklch(0 0 0 / 0.72) 0%, oklch(0 0 0 / 0.30) 55%, transparent 100%)",
-        }}
-      />
-
-      {/* Content — anchored to the dark top zone, just below the fixed nav */}
-      <div className="relative z-10 w-full flex flex-col items-center px-5 sm:px-8 pt-[5.5rem] pb-0 text-center">
-
-        {/* Eyebrow */}
-        <div className="inline-flex items-center gap-2 rounded-full border border-white/18 bg-white/[0.08] backdrop-blur-sm px-3.5 py-1 mb-5">
-          <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
-          <span className="text-[10px] font-semibold text-white/65 tracking-[0.10em] uppercase">
+        <div className="inline-flex items-center gap-2 rounded-full border border-silver-pine/20 bg-canvas-white/60 backdrop-blur-md px-3.5 py-1 mb-6 shadow-sm">
+          <span className="size-1.5 rounded-full bg-electric-blue animate-pulse" />
+          <span className="text-[10px] font-bold text-silver-pine tracking-[0.10em] uppercase">
             Trusted Community Voting
           </span>
         </div>
 
-        {/* Headline */}
         <h1
-          className="text-white font-extrabold leading-[1.12] max-w-2xl"
+          className="text-obsidian font-bold leading-[1.12] max-w-3xl font-heading"
           style={{
-            fontSize: "clamp(1.5rem, 3vw, 2.4rem)",
-            letterSpacing: "-0.025em",
+            fontSize: "clamp(2rem, 4vw, 3.5rem)",
+            letterSpacing: "-0.02em",
           } as React.CSSProperties}
         >
           Run secure voting for
           <br />
-          <span className="text-primary">
+          <span className="text-electric-blue">
             <HeroCyclingWord />
           </span>
         </h1>
 
-        {/* Subtitle */}
-        <p className="mt-4 text-white/60 text-[0.8125rem] leading-relaxed max-w-[38ch]">
+        <p className="mt-6 text-silver-pine font-medium text-lg leading-relaxed max-w-[42ch]">
           Create public or geo-restricted votes in minutes. Live results,
           duplicate prevention, and QR access — built for the room.
         </p>
 
-        {/* CTAs */}
-        <div className="mt-6">
+        <div className="mt-8">
           <LandingHeroActions />
         </div>
       </div>
@@ -67,11 +56,17 @@ function HeroSection() {
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-canvas-white font-sans text-obsidian">
       <LandingNav />
       <main>
         <HeroSection />
+        <IntroSection />
+        <FeaturesSection />
+        <UseCasesSection />
+        <TestimonialSection />
+        <FinalCtaSection />
       </main>
+      <LandingFooter />
     </div>
   )
 }

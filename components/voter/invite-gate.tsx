@@ -53,7 +53,7 @@ export function InviteGate({ vote, positions }: Props) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center px-6 text-center gap-5">
         <div className="size-16 rounded-2xl bg-destructive/10 flex items-center justify-center">
-          <Lock className="size-7 text-destructive" />
+          <Lock aria-hidden="true" className="size-7 text-destructive" />
         </div>
         <div className="space-y-2">
           <h1 className="text-2xl font-black tracking-tight">Not on the list</h1>
@@ -96,7 +96,7 @@ export function InviteGate({ vote, positions }: Props) {
         {/* Header */}
         <div className="text-center space-y-3">
           <div className="size-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto">
-            <Lock className="size-6 text-primary" />
+            <Lock aria-hidden="true" className="size-6 text-primary" />
           </div>
           <div>
             <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-1.5">
@@ -128,10 +128,12 @@ export function InviteGate({ vote, positions }: Props) {
               placeholder="e.g. you@example.com"
               value={input}
               onChange={(e) => setInput(e.target.value)}
+              aria-invalid={!!inputError}
+              aria-describedby={inputError ? "contact-error" : undefined}
               className="w-full h-12 rounded-xl border border-border bg-background px-4 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
             />
             {inputError && (
-              <p className="text-xs text-red-500">{inputError}</p>
+              <p id="contact-error" role="alert" className="text-xs text-red-500">{inputError}</p>
             )}
           </div>
           <button

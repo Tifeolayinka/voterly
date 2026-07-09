@@ -47,13 +47,13 @@ function SortableItem({ candidate, rank }: SortableItemProps) {
         className="touch-none cursor-grab active:cursor-grabbing text-slate-300 hover:text-slate-500 transition-colors p-1 -ml-0.5 shrink-0"
         {...attributes}
         {...listeners}
-        aria-label="Drag to reorder"
+        aria-label={`Drag to reorder ${candidate.name}`}
       >
         <GripVertical className="size-5" />
       </button>
 
       {/* Rank badge */}
-      <span className="size-7 flex shrink-0 items-center justify-center rounded-full bg-primary text-white text-xs font-bold">
+      <span aria-hidden="true" className="size-7 flex shrink-0 items-center justify-center rounded-full bg-primary text-white text-xs font-bold">
         {rank}
       </span>
 

@@ -34,11 +34,20 @@ export function CandidateCard({ candidate, selected, onClick, disabled }: Candid
     setImgIdx((i) => (i + 1) % images.length)
   }
 
+  function handleKeyDown(e: React.KeyboardEvent) {
+    if (!hasMultiple) return
+    if (e.key === "ArrowLeft") { e.preventDefault(); setImgIdx((i) => (i - 1 + images.length) % images.length) }
+    if (e.key === "ArrowRight") { e.preventDefault(); setImgIdx((i) => (i + 1) % images.length) }
+  }
+
   return (
     <button
       type="button"
       disabled={disabled}
       onClick={onClick}
+      onKeyDown={handleKeyDown}
+      aria-pressed={selected}
+      aria-label={`${candidate.name}${hasMultiple ? `, photo ${imgIdx + 1} of ${images.length}, use arrow keys to browse` : ""}`}
       style={{ touchAction: "manipulation" }}
       className={cn(
         "relative block w-full aspect-[3/4] rounded-2xl overflow-hidden",
@@ -88,14 +97,14 @@ export function CandidateCard({ candidate, selected, onClick, disabled }: Candid
       {/* Invisible tap zones for multi-image navigation */}
       {hasMultiple && (
         <>
-          <div onClick={prev} className="absolute inset-y-0 left-0 w-2/5 z-10" />
-          <div onClick={next} className="absolute inset-y-0 right-0 w-2/5 z-10" />
+          <div aria-hidden="true" onClick={prev} className="absolute inset-y-0 left-0 w-2/5 z-10" />
+          <div aria-hidden="true" onClick={next} className="absolute inset-y-0 right-0 w-2/5 z-10" />
         </>
       )}
 
       {/* Selection badge */}
       {selected && (
-        <div className="absolute top-3 right-3 size-7 rounded-full bg-primary flex items-center justify-center shadow-sm z-20">
+        <div aria-hidden="true" className="absolute top-3 right-3 size-7 rounded-full bg-primary flex items-center justify-center shadow-sm z-20">
           <Check className="size-3.5 text-white" strokeWidth={3} />
         </div>
       )}

@@ -141,7 +141,7 @@ export function GeoGate({ vote, positions, contact }: Props) {
 
   if (status === "requesting" || status === "server_check") {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center px-6 gap-8">
+      <div role="status" className="min-h-screen flex flex-col items-center justify-center px-6 gap-8">
         {/* Vote details */}
         <div className="text-center space-y-2 max-w-sm">
           <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
@@ -156,8 +156,9 @@ export function GeoGate({ vote, positions, contact }: Props) {
         {/* Location check strip */}
         <div className="flex flex-col items-center gap-3">
           <div className="size-12 rounded-2xl bg-primary/10 flex items-center justify-center">
-            <Loader2 className="size-5 text-primary animate-spin" />
+            <Loader2 aria-hidden="true" className="size-5 text-primary animate-spin" />
           </div>
+          <span className="sr-only">Checking your location…</span>
           <div className="space-y-1 text-center">
             <p className="text-sm font-semibold">
               {status === "server_check" ? "Verifying your location…" : "Checking your location"}
@@ -178,7 +179,7 @@ export function GeoGate({ vote, positions, contact }: Props) {
   if (status === "denied") {
     return (
       <Screen
-        icon={<ShieldOff className="size-7 text-primary" />}
+        icon={<ShieldOff aria-hidden="true" className="size-7 text-primary" />}
         title="Location access required"
         body={`"${vote.title}" is restricted to attendees at the venue. Enable location in your browser settings and reload the page.`}
         action={
@@ -207,7 +208,7 @@ export function GeoGate({ vote, positions, contact }: Props) {
   if (status === "timeout") {
     return (
       <Screen
-        icon={<WifiOff className="size-7 text-slate-400" />}
+        icon={<WifiOff aria-hidden="true" className="size-7 text-slate-400" />}
         title="Location timed out"
         body="Couldn't get a location fix in time. On Mac, make sure Wi-Fi is on (it's used for location even without a network). On mobile, step outside or to an area with better signal."
         action={retryButton}
@@ -218,7 +219,7 @@ export function GeoGate({ vote, positions, contact }: Props) {
   if (status === "unavailable") {
     return (
       <Screen
-        icon={<WifiOff className="size-7 text-slate-400" />}
+        icon={<WifiOff aria-hidden="true" className="size-7 text-slate-400" />}
         title="Couldn't verify location"
         body="Your device can't determine your location. Check that location is enabled for your browser in your device's system settings (not just the browser prompt), then try again."
         action={retryButton}
@@ -233,7 +234,7 @@ export function GeoGate({ vote, positions, contact }: Props) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center px-6 text-center gap-5">
         <div className="size-16 rounded-2xl bg-destructive/10 flex items-center justify-center">
-          <MapPin className="size-7 text-destructive" />
+          <MapPin aria-hidden="true" className="size-7 text-destructive" />
         </div>
         <div className="space-y-2">
           <h1 className="text-2xl font-black tracking-tight">You're not at the venue</h1>

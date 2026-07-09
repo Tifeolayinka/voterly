@@ -192,6 +192,11 @@ export function BallotShell({ vote, positions, voterLat, voterLng, contact }: Pr
 
   return (
     <div className="min-h-dvh flex flex-col">
+      {/* Screen reader live region — announces position changes */}
+      <span className="sr-only" aria-live="polite" aria-atomic="true">
+        {current ? `Position ${currentIdx + 1} of ${positions.length}: ${current.title}` : ""}
+      </span>
+
       {/* ─── Sticky header ─── */}
       <div className="sticky top-0 z-10 bg-background/90 backdrop-blur-sm border-b border-border px-4 pt-3 pb-3">
         <div className="max-w-lg mx-auto space-y-2.5">
@@ -327,7 +332,7 @@ export function BallotShell({ vote, positions, voterLat, voterLng, contact }: Pr
           {/* Fingerprinting disclaimer — shown only on the last step */}
           {currentIdx === positions.length - 1 && (
             <p className="flex items-start gap-1.5 text-[10px] text-muted-foreground leading-relaxed">
-              <Info className="size-3 shrink-0 mt-[1px]" />
+              <Info aria-hidden="true" className="size-3 shrink-0 mt-[1px]" />
               One vote per device is enforced via browser fingerprinting. Fingerprints
               may not prevent submissions from different devices or browsers.
             </p>
